@@ -1,0 +1,3 @@
+C:/msys64/home/Izzorious/HarfbuzzTest/cmake-build-debug/CMakeFiles/HarfbuzzTest.dir
+C:/msys64/home/Izzorious/HarfbuzzTest/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/msys64/home/Izzorious/HarfbuzzTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir

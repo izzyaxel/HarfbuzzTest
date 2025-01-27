@@ -1,0 +1,3 @@
+C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\HarfbuzzTest.dir/objects.a
+C:\msys64\mingw64\bin\ar.exe qc CMakeFiles\HarfbuzzTest.dir/objects.a @CMakeFiles\HarfbuzzTest.dir\objects1.rsp
+C:\msys64\mingw64\bin\g++.exe  -Wall -Wextra -Wpedantic -Wformat-security -Wno-unused -Wno-cast-function-type -Wno-missing-field-initializers -fno-omit-frame-pointer -ggdb3 -g -O0 -g -Wl,--whole-archive CMakeFiles\HarfbuzzTest.dir/objects.a -Wl,--no-whole-archive -o HarfbuzzTest.exe -Wl,--out-implib,libHarfbuzzTest.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\HarfbuzzTest.dir\linkLibs.rsp
