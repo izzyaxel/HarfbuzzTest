@@ -36,6 +36,7 @@ set(SOURCE
         src/languages.hh
         src/textFeatures.cc src/textFeatures.hh
         src/textLanguage.hh)
+
 set(LIBS harfbuzz freetype fontconfig icuuc)
 
 project(HarfbuzzTest)
