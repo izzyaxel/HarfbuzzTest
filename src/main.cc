@@ -1,4 +1,4 @@
-#include "textLanguage.hh"
+#include "config/textLanguage.hh"
 
 #include <harfbuzz/hb-ft.h>
 #include <harfbuzz/hb.h>

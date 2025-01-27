@@ -33,9 +33,9 @@ endif()
 
 set(SOURCE
         src/main.cc
-        src/languages.hh
-        src/textFeatures.cc src/textFeatures.hh
-        src/textLanguage.hh)
+        src/config/languages.hh
+        src/config/textFeatures.cc src/config/textFeatures.hh
+        src/config/textLanguage.hh)
 
 set(LIBS harfbuzz freetype fontconfig icuuc)
 
