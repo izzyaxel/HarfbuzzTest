@@ -113,13 +113,13 @@ int main()
   const std::string textB = "The quick brown fox";
   std::unordered_map<ID, FontData> fonts{};
   
-  const std::vector<u8> fontDataHack = readFile(std::filesystem::current_path().string() + "/Hack-Regular.ttf");
+  const std::vector<u8> fontDataHack = readFile(std::filesystem::current_path().string() + "/fonts/Hack-Regular.ttf");
   if(fontDataHack.empty())
   {
     return -1;
   }
 
-  const std::vector<u8> fontDataDejaVu = readFile(std::filesystem::current_path().string() + "/DejaVuSans.ttf");
+  const std::vector<u8> fontDataDejaVu = readFile(std::filesystem::current_path().string() + "/fonts/DejaVuSans.ttf");
   if(fontDataDejaVu.empty())
   {
     return -1;
@@ -140,7 +140,7 @@ int main()
   shapeText(textA, eng, fonts.at(hackID));
   shapeText(textB, eng, fonts.at(dejaVuID));
   
-  printf("No segfaults\n");
+  printf("Success\n");
   
   return 0;
 }

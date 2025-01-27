@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Misc
+/.idea
+/cmake-build-debug
+/cmake-build-debug-profiling
+/cmake-build-release
+/cmake-build-relwithdebinfo
+/cmake-build-minsizerel

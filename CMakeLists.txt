@@ -39,3 +39,6 @@ set(LIBS harfbuzz freetype fontconfig icuuc)
 project(HarfbuzzTest)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+#Copy the files the editor needs to run into the build directory
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/fonts" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
