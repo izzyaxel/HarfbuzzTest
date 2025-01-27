@@ -14,9 +14,9 @@ using u64 = uint64_t;
 using ID = u64;
 
 constexpr static ID INVALID_ID = std::numeric_limits<ID>::max();
-constexpr static float POINTSIZE = 32.0f;
+constexpr static float POINT_SIZE = 32.0f;
 constexpr static float SCALAR = 64.0f;
-constexpr static long SCALEDPS = (long)(POINTSIZE * SCALAR);
+constexpr static long SCALED_PS = (long)(POINT_SIZE * SCALAR);
 
 template <typename T>
 struct vec2
@@ -72,7 +72,7 @@ size_t addFont(std::unordered_map<ID, FontData>& fontMap, const std::vector<u8>&
   }
 
   //Set FreeType font size
-  ftError = FT_Set_Char_Size(fontMap.at(index).ftFace, SCALEDPS, SCALEDPS, 0, 0);
+  ftError = FT_Set_Char_Size(fontMap.at(index).ftFace, SCALED_PS, SCALED_PS, 0, 0);
   if(ftError != 0)
   {
     return INVALID_ID;
