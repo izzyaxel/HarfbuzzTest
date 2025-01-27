@@ -26,6 +26,12 @@ struct vec2
 
 struct FontData
 {
+  ~FontData()
+  {
+    hb_font_destroy(this->hbFont);
+    FT_Done_FreeType(this->ftLib);
+  }
+  
   FT_Library ftLib = nullptr;
   FT_Face ftFace = nullptr;
   hb_font_t* hbFont = nullptr;
