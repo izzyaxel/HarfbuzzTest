@@ -32,8 +32,10 @@ elseif(APPLE)
 endif()
 
 set(SOURCE
-        main.cc
-        languages.hh textFeatures.cc textFeatures.hh textLanguage.hh)
+        src/main.cc
+        src/languages.hh
+        src/textFeatures.cc src/textFeatures.hh
+        src/textLanguage.hh)
 set(LIBS harfbuzz freetype fontconfig icuuc)
 
 project(HarfbuzzTest)
