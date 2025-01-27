@@ -11,6 +11,8 @@
 * Build the project
 
 ## Other OS Setup
+#### Untested, some includes may need to be added in the project files
+
 * Install the necessary packages: `harfbuzz freetype fontconfig`
 * Clone this repository
 * Set up your toolchain
