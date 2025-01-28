@@ -21,4 +21,5 @@ struct FontData
   u32 tallestGlyph = 0;
   std::unordered_map<char, vec2<u32>> glyphSizes{};
   bool ready = false;
+  std::string name;
 };
