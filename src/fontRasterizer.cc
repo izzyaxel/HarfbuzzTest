@@ -58,16 +58,14 @@ ID FontRasterizer::addFont(const std::vector<u8>& fontData, const std::string& n
   return index;
 }
 
-ID FontRasterizer::rasterizeFont(const ID font)
+void FontRasterizer::rasterizeFont(const ID font, glr::Atlas& atlas, glr::Texture& atlasTexture)
 {
   if(!this->fonts.contains(font))
   {
-    return INVALID_ID;
+    return;
   }
 
   FontData& fontData = this->fonts.at(font);
-  const ID out = 0;
-  //ID out = newAtlas();
   FT_Error ftError = 0;
   
   //Rasterize to the font texture atlas
@@ -78,7 +76,7 @@ ID FontRasterizer::rasterizeFont(const ID font)
     {
       continue;
     }
-    const FT_GlyphSlot g = fontData.ftFace->glyph;
+    FT_GlyphSlot g = fontData.ftFace->glyph;
     const u32 w = g->bitmap.pitch;
     const u32 h = g->bitmap.rows;
     if(w == 0 || h == 0)
@@ -95,14 +93,10 @@ ID FontRasterizer::rasterizeFont(const ID font)
     {
       continue;
     }
-    //getAtlas(out).addTile(std::string{i}, glr::TexColorFormat::GREY, std::move(next), w, h);
+    atlas.addTile(std::string{i}, glr::TexColorFormat::GREY, std::move(next), w, h);
   }
-  
-  //finalizeAtlas(fontData.name + " " + std::to_string(fontData.fontPointSize) + "pt ID: " + std::to_string(this->lastFontID), out, atlasTextureID, fmt);
-
+  atlas.finalize(fontData.name + " " + std::to_string(fontData.fontPointSize) + "pt ID: " + std::to_string(this->lastFontID), atlasTexture, glr::TexColorFormat::GREY);
   fontData.ready = true;
-  
-  return out;
 }
 
 std::vector<vec2<float>> FontRasterizer::shapeText(const std::string& text, const Language& language, const ID fontID)
@@ -167,7 +161,7 @@ vec2<u32> FontRasterizer::getGlyphSize(const ID fontID, const char glyph)
   return this->fonts.at(fontID).glyphSizes.at(glyph);
 }
 
-bool FontRasterizer::isFontReady(ID fontID)
+bool FontRasterizer::isFontRasterized(ID fontID)
 {
   if(!this->fonts.contains(fontID))
   {

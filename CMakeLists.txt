@@ -3,6 +3,8 @@ set(ARCH "x86_64")
 set(CMAKE_CXX_STANDARD 26)
 cmake_policy(SET CMP0100 NEW)
 
+include(FetchContent)
+
 #Base flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wformat-security -Wno-unused -Wno-cast-function-type -Wno-missing-field-initializers")
 
@@ -31,24 +33,43 @@ elseif(APPLE)
   add_definitions(-DOSX)
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+FetchContent_Declare(libGLRender
+                     GIT_REPOSITORY "https://github.com/izzyaxel/libGLRender.git"
+                     GIT_TAG "origin/main"
+                     SOURCE_DIR "modules/libGLRender")
+
+FetchContent_Declare(libcommons
+                     GIT_REPOSITORY "https://github.com/izzyaxel/libcommons.git"
+                     GIT_TAG "origin/master"
+                     SOURCE_DIR "modules/libcommons")
+
+FetchContent_MakeAvailable(libcommons libGLRender)
+
+include_directories("${CMAKE_BINARY_DIR}/modules/libcommons/src/")
+include_directories("${CMAKE_BINARY_DIR}/modules/libGLRender/src/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 set(SOURCE
-        src/main.cc
+    src/main.cc
 
-        src/langs/languages.hh
-        src/langs/textFeatures.cc src/langs/textFeatures.hh
-        src/langs/textLanguage.hh
-        
-        src/fontRasterizer.cc src/fontRasterizer.hh
-        src/alias.hh
-        src/util.hh
-        src/fontData.hh)
+    src/langs/languages.hh
+    src/langs/textFeatures.cc src/langs/textFeatures.hh
+    src/langs/textLanguage.hh
 
-set(LIBS harfbuzz freetype fontconfig icuuc)
+    src/fontRasterizer.cc src/fontRasterizer.hh
+    src/alias.hh
+    src/util.hh
+    src/fontData.hh
+    src/openGl.cc
+    src/openGl.hh)
+
+set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc)
 
 project(HarfbuzzTest)
 add_executable(${PROJECT_NAME} ${SOURCE})
+add_dependencies(${PROJECT_NAME} commons GLRender)
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 #Copy the files the editor needs to run into the build directory

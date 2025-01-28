@@ -1,19 +1,29 @@
 #include "fontRasterizer.hh"
 #include "util.hh"
+#include "openGl.hh"
+
+#include <glrAtlas.hh>
 
 int main()
 {
   FontRasterizer fontRasterizer;
   const ID hackID = fontRasterizer.addFont(cwd + "/fonts/Hack-Regular.ttf", "Hack Regular", 24);
-  const ID dejaVuID = fontRasterizer.addFont(cwd + "/fonts/DejaVuSans.ttf", "DejaVu Sans", 24);
+  const ID dejaVuID = fontRasterizer.addFont(cwd + "/fonts/DejaVuSans.ttf", "DejaVu Sans", 32);
   if(hackID == INVALID_ID || dejaVuID == INVALID_ID)
   {
     return -1;
   }
 
-  fontRasterizer.rasterizeFont(hackID);
-  fontRasterizer.rasterizeFont(dejaVuID);
-  if(!fontRasterizer.isFontReady(hackID) || !fontRasterizer.isFontReady(dejaVuID))
+  //TODO Create OpenGL context
+  startOpenGL();
+  glr::Atlas hackAtlas = {};
+  glr::Atlas dejaVuAtlas = {};
+  glr::Texture hackTexture = {};
+  glr::Texture dejaVuTexture = {};
+  
+  fontRasterizer.rasterizeFont(hackID, hackAtlas, hackTexture);
+  fontRasterizer.rasterizeFont(dejaVuID, dejaVuAtlas, dejaVuTexture);
+  if(!fontRasterizer.isFontRasterized(hackID) || !fontRasterizer.isFontRasterized(dejaVuID))
   {
     return -1;
   }
