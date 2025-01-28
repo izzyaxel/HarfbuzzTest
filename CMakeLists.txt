@@ -31,6 +31,8 @@ elseif(APPLE)
   add_definitions(-DOSX)
 endif()
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
 set(SOURCE
         src/main.cc
 
