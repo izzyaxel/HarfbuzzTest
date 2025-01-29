@@ -1,73 +1,69 @@
 #include "fontRasterizer.hh"
 
-ID FontRasterizer::addFont(const std::string& fontPath, const std::string& name, u32 pointSize)
+ID FontRasterizer::loadFont(const std::string &fontPath, const std::string& name)
 {
+  if(fontPath.empty())
+  {
+    return INVALID_ID;
+  }
+  
   const std::vector<u8> fontData = readFile(fontPath);
   
   if(fontData.empty())
   {
     return INVALID_ID;
   }
-  
-  return this->addFont(fontData, name, pointSize);
+
+  const ID index = this->lastFontFileID;
+  this->lastFontFileID++;
+  this->fontFiles[index] = std::make_pair(name, fontData);
+  return index;
 }
 
-ID FontRasterizer::addFont(const std::vector<u8>& fontData, const std::string& name, const u32 pointSize)
+ID FontRasterizer::rasterizeFont(const ID font, const u32 pointSize)
 {
-  if(pointSize == 0)
+  if(font == INVALID_ID || !this->fontFiles.contains(font) || pointSize == 0)
   {
     return INVALID_ID;
   }
   
   const ID index = this->lastFontID;
   this->lastFontID++;
-  this->fonts[index] = {};
+  this->fonts[index];
 
-  FontData& font = this->fonts.at(index);
-  font.fontPointSize = pointSize;
-  font.name = name;
+  auto& [name, data] = this->fontFiles[font];
+  FontData& fontData = this->fonts.at(index);
+  fontData.fontPointSize = pointSize;
+  fontData.name = name;
   
   //Start FreeType
-  FT_Error ftError = FT_Init_FreeType(&font.ftLib);
-  if(ftError != 0 || !font.ftLib)
+  FT_Error ftError = FT_Init_FreeType(&fontData.ftLib);
+  if(ftError != 0 || !fontData.ftLib)
   {
     return INVALID_ID;
   }
 
   //Create FreeType font
-  ftError = FT_New_Memory_Face(font.ftLib, fontData.data(), (long)fontData.size(), 0, &font.ftFace);
+  ftError = FT_New_Memory_Face(fontData.ftLib, data.data(), (long)data.size(), 0, &fontData.ftFace);
   if(ftError != 0)
   {
     return INVALID_ID;
   }
 
   //Set FreeType font size
-  ftError = FT_Set_Char_Size(font.ftFace, (long)(SCALAR * (float)pointSize), (long)(SCALAR * (float)pointSize), 0, 0);
+  ftError = FT_Set_Char_Size(fontData.ftFace, (long)(SCALAR * (float)pointSize), (long)(SCALAR * (float)pointSize), 0, 0);
   if(ftError != 0)
   {
     return INVALID_ID;
   }
 
   //Create HarfBuzz font from the FreeType face
-  font.hbFont = hb_ft_font_create_referenced(font.ftFace);
-  if(!font.hbFont)
+  fontData.hbFont = hb_ft_font_create_referenced(fontData.ftFace);
+  if(!fontData.hbFont)
   {
     return INVALID_ID;
   }
-  
-  return index;
-}
 
-void FontRasterizer::rasterizeFont(const ID font, glr::Atlas& atlas, glr::Texture& atlasTexture)
-{
-  if(!this->fonts.contains(font))
-  {
-    return;
-  }
-
-  FontData& fontData = this->fonts.at(font);
-  FT_Error ftError = 0;
-  
   //Rasterize to the font texture atlas
   for(char i = 33; i < 127; i++) //TODO non-ASCII
   {
@@ -76,6 +72,7 @@ void FontRasterizer::rasterizeFont(const ID font, glr::Atlas& atlas, glr::Textur
     {
       continue;
     }
+    
     FT_GlyphSlot g = fontData.ftFace->glyph;
     const u32 w = g->bitmap.pitch;
     const u32 h = g->bitmap.rows;
@@ -83,20 +80,26 @@ void FontRasterizer::rasterizeFont(const ID font, glr::Atlas& atlas, glr::Textur
     {
       continue;
     }
+    
     fontData.glyphSizes[i] = {w, h};
-    if(fontData.glyphSizes[i].y() > fontData.tallestGlyph) //Find the tallest glyph
+
+    //Find the tallest glyph
+    if(fontData.glyphSizes.at(i).y() > fontData.tallestGlyph)
     {
-      fontData.tallestGlyph = fontData.glyphSizes[i].y();
+      fontData.tallestGlyph = fontData.glyphSizes.at(i).y();
     }
     std::vector next(g->bitmap.buffer, g->bitmap.buffer + w * h);
     if(next.empty())
     {
       continue;
     }
-    atlas.addTile(std::string{i}, glr::TexColorFormat::GREY, std::move(next), w, h);
+    fontData.atlas.addTile(std::string{i}, glr::TexColorFormat::GREY, std::move(next), w, h);
   }
-  atlas.finalize(fontData.name + " " + std::to_string(fontData.fontPointSize) + "pt ID: " + std::to_string(this->lastFontID), atlasTexture, glr::TexColorFormat::GREY);
+  
+  fontData.atlas.finalize(fontData.name + " " + std::to_string(fontData.fontPointSize) + "pt ID: " + std::to_string(this->lastFontID), fontData.texture, glr::TexColorFormat::GREY);
   fontData.ready = true;
+  
+  return index;
 }
 
 std::vector<vec2<float>> FontRasterizer::shapeText(const std::string& text, const Language& language, const ID fontID)
@@ -108,14 +111,11 @@ std::vector<vec2<float>> FontRasterizer::shapeText(const std::string& text, cons
   hb_buffer_set_direction(hbBuffer, language.direction);
   hb_buffer_set_language(hbBuffer, hb_language_from_string(language.lang.c_str(), -1));
   hb_buffer_add_utf8(hbBuffer, text.c_str(), -1, 0, -1);
-  hb_font_t* hbFont = hb_font_reference(fontData.hbFont);
-  hb_shape(hbFont, hbBuffer, nullptr, 0);
+  hb_shape(fontData.hbFont, hbBuffer, nullptr, 0);
   if(hb_buffer_get_content_type(hbBuffer) != HB_BUFFER_CONTENT_TYPE_GLYPHS)
   {
-    hb_font_destroy(hbFont);
     return{};
   }
-  hb_font_destroy(hbFont);
 
   //Calculate pen positions for each glyph
   u32 bufferLength;
@@ -140,28 +140,24 @@ std::vector<vec2<float>> FontRasterizer::shapeText(const std::string& text, cons
     xadv += gp.x_advance;
     yadv += gp.y_advance;
   }
+  
   return penPositions;
 }
 
-FontData& FontRasterizer::getFont(const ID fontID)
+vec2<u32> FontRasterizer::getGlyphSize(const ID rasterizedFontID, const char glyph) const
 {
-  return this->fonts.contains(fontID) ? this->fonts.at(fontID) : this->nullFont;
-}
-
-vec2<u32> FontRasterizer::getGlyphSize(const ID fontID, const char glyph)
-{
-  if(!this->fonts.contains(fontID))
+  if(!this->fonts.contains(rasterizedFontID))
   {
     return {};
   }
-  if(!this->fonts.at(fontID).glyphSizes.contains(glyph))
+  if(!this->fonts.at(rasterizedFontID).glyphSizes.contains(glyph))
   {
     return {};
   }
-  return this->fonts.at(fontID).glyphSizes.at(glyph);
+  return this->fonts.at(rasterizedFontID).glyphSizes.at(glyph);
 }
 
-bool FontRasterizer::isFontRasterized(ID fontID)
+bool FontRasterizer::isFontRasterized(const ID fontID) const
 {
   if(!this->fonts.contains(fontID))
   {
@@ -170,3 +166,4 @@ bool FontRasterizer::isFontRasterized(ID fontID)
   
   return this->fonts.at(fontID).ready;
 }
+

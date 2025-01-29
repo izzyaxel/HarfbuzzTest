@@ -1,8 +1,8 @@
 #pragma once
 
-#include "alias.hh"
-#include "util.hh"
+#include "../util.hh"
 
+#include <glrAtlas.hh>
 #include <harfbuzz/hb-ft.h>
 #include <unordered_map>
 
@@ -10,10 +10,22 @@ struct FontData
 {
   ~FontData()
   {
-    hb_font_destroy(this->hbFont);
-    FT_Done_FreeType(this->ftLib);
+    if(this->hbFont)
+    {
+      hb_font_destroy(this->hbFont);
+    }
+    if(this->ftFace)
+    {
+      FT_Done_Face(this->ftFace);
+    }
+    if(this->ftLib)
+    {
+      FT_Done_FreeType(this->ftLib);
+    }
   }
   
+  glr::Atlas atlas;
+  glr::Texture texture;
   FT_Library ftLib = nullptr;
   FT_Face ftFace = nullptr;
   hb_font_t* hbFont = nullptr;

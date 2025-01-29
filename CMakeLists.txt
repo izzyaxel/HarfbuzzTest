@@ -51,19 +51,18 @@ include_directories("${CMAKE_BINARY_DIR}/modules/libcommons/src/")
 include_directories("${CMAKE_BINARY_DIR}/modules/libGLRender/src/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
-set(SOURCE
-    src/main.cc
-
-    src/langs/languages.hh
-    src/langs/textFeatures.cc src/langs/textFeatures.hh
-    src/langs/textLanguage.hh
-
-    src/fontRasterizer.cc src/fontRasterizer.hh
-    src/alias.hh
-    src/util.hh
-    src/fontData.hh
-    src/openGl.cc
-    src/openGl.hh)
+set(SOURCE 
+        src/main.cc
+        src/alias.hh
+        src/util.hh
+        src/window.cc src/window.hh
+        src/application.hh src/application.cc
+        
+        src/text/fontData.hh
+        src/text/fontRasterizer.cc src/text/fontRasterizer.hh
+        src/text/langs/languages.hh
+        src/text/langs/textFeatures.cc src/text/langs/textFeatures.hh
+        src/text/langs/textLanguage.hh)
 
 set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc)
 
