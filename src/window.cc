@@ -1,4 +1,5 @@
 #include "window.hh"
+#include "shaders.hh"
 
 #include <SDL2/SDL.h>
 #include <glrRenderer.hh>
@@ -6,7 +7,7 @@
 Window::Window(const u32 width, const u32 height)
 {
   SDL_Init(SDL_INIT_EVERYTHING);
-  this->window = SDL_CreateWindow("Harfbuzz Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+  this->window = SDL_CreateWindow("Harfbuzz Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (i32)width, (i32)height, SDL_WINDOW_OPENGL);
   if(!this->window)
   {
     throw std::runtime_error("Failed to create a window");
@@ -39,6 +40,13 @@ Window::~Window()
   SDL_GL_DeleteContext(context);
   SDL_DestroyWindow(static_cast<SDL_Window*>(window));
   SDL_Quit();
+}
+
+void Window::draw(glr::RenderList&& renderList)
+{
+  const mat4x4<float> v = viewMatrix(quat<float>{}, vec3<float>{0, 0, 1});
+  const mat4x4<float> p = orthoProjectionMatrix(800 / -2.0f, 800 / 2.0f, 600 / 2.0f, 600 / -2.0f, 0.1f, 1.0f);
+  static_cast<glr::Renderer*>(this->renderer)->render(renderList, v, p);
 }
 
 void Window::clearFramebuffer() const

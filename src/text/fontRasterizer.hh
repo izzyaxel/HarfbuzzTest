@@ -2,7 +2,7 @@
 
 #include "../alias.hh"
 #include "fontData.hh"
-#include "langs/textLanguage.hh"
+#include "text.hh"
 
 #include <commons/math/vec2.hh>
 
@@ -15,17 +15,17 @@ struct FontRasterizer
   ID loadFont(const std::string& fontPath, const std::string& name);
   
   /// Load and rasterize a font
-  /// @param font The font file to use
-  /// @param pointSize The point size the font should be rasterized at, each size requires a separate texture atlas
+  /// @param fontFileID The font file to use
+  /// @param text 
   /// @return The rasterized font's ID
-  ID rasterizeFont(ID font, u32 pointSize);
+  void rasterizeFont(ID fontFileID, Text& text);
 
   /// Create a layout with the given text, language, and font
-  /// @param text The text
-  /// @param language The language
-  /// @param fontID The font's ID
+  /// @param text 
   /// @return The pen positions of each glyph in the given text
-  std::vector<vec2<float>> shapeText(const std::string& text, const Language& language, ID fontID);
+  void shapeText(Text& text);
+
+  FontData& getFontData(ID fontID);
 
   /// Get the width/height of a glyph for a given font/point size
   /// @param rasterizedFontID The rasterized font
