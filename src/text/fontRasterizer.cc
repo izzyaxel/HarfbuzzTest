@@ -1,5 +1,7 @@
 #include "fontRasterizer.hh"
 
+#include "glrExternal.hh"
+
 ID FontRasterizer::loadFont(const std::string &fontPath, const std::string& name)
 {
   if(fontPath.empty())
@@ -101,7 +103,9 @@ void FontRasterizer::rasterizeFont(const ID fontFileID, Text& text)
     }
     fontData.atlas.addTile(std::string{i}, glr::TexColorFormat::GREY, std::move(next), w, h);
   }
-  
+
+  glr::pixelStoreiPack(1);
+  glr::pixelStoreiUnpack(1);
   fontData.atlas.finalize(fontData.name + " " + std::to_string(fontData.fontPointSize) + "pt ID: " + std::to_string(this->lastFontID), fontData.texture, glr::TexColorFormat::GREY);
   fontData.ready = true;
   text.fontID = index;

@@ -6,25 +6,26 @@
 
 glr::Shader objectShader;
 glr::Shader textShader;
+
 glr::Mesh fullscreenQuad;
 glr::Mesh quad;
+
+constexpr std::array<float, 8>  fullscreenQuadUVs{1, 0, 1, 1, 0, 0, 0, 1};
+constexpr std::array<float, 12> fullscreenQuadVerts{1, -1, 0, 1, 1, 0, -1, -1, 0, -1, 1, 0};
+constexpr std::array<float, 8>  orthoQuadUVs{1, 0, 0, 0, 1, 1, 0, 1};
+constexpr std::array<float, 12> cQuadVerts{0.5f, 0.5f, 0, -0.5f, 0.5f, 0, 0.5f, -0.5f, 0, -0.5f, -0.5f, 0};
+constexpr std::array<float, 12> llQuadVerts{1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0};
+constexpr std::array<float, 12> lrQuadVerts{0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 0, 0};
+constexpr std::array<float, 12> ulQuadVerts{1, 0, 0, 0, 0, 0, 1, -1, 0, 0, -1, 0};
+constexpr std::array<float, 12> urQuadVerts{0, 0, 0, -1, 0, 0, 0, -1, 0, -1, -1, 0};
 
 Application::Application(const u32 width, const u32 height) : window(width, height)
 {
   objectShader = glr::Shader("Object shader", vertSrc, fragSrc);
   textShader = glr::Shader("Text shader", vertSrc, textFragSrc);
-
-  const std::vector<float> orthoQuadUVs{1, 0, 0, 0, 1, 1, 0, 1};
-  const std::vector<float> fullscreenQuadUVs{1, 0, 1, 1, 0, 0, 0, 1};
-  const std::vector<float> fullscreenQuadVerts{1, -1, 0, 1, 1, 0, -1, -1, 0, -1, 1, 0};
-  const std::vector<float> centeredQuadVerts{0.5f, 0.5f, 0, -0.5f, 0.5f, 0, 0.5f, -0.5f, 0, -0.5f, -0.5f, 0};
-  const std::vector<float> llQuadVerts{1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0};
-  const std::vector<float> lrQuadVerts{0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 0, 0};
-  const std::vector<float> ulQuadVerts{1, 0, 0, 0, 0, 0, 1, -1, 0, 0, -1, 0};
-  const std::vector<float> urQuadVerts{0, 0, 0, -1, 0, 0, 0, -1, 0, -1, -1, 0};
   
   fullscreenQuad = glr::Mesh(fullscreenQuadVerts, fullscreenQuadUVs);
-  quad = glr::Mesh(centeredQuadVerts, orthoQuadUVs);
+  quad = glr::Mesh(cQuadVerts, orthoQuadUVs);
 }
 
 void Application::addText(const Text& text)
@@ -62,10 +63,10 @@ void Application::run()
     glr::RenderList rl;
     for(const auto& text : this->textToRender)
     {
-      glr::Renderable r{{0.0f, 0.0f, 0.0f}, {800, 600, 1}, quat<float>{},
+      glr::Renderable r{{0.0f, 0.0f, 0.0f}, {100, 100, 1}, quat<float>{},
       &this->fontRasterizer.getFontData(text.fontID).texture,
       &objectShader,
-      &fullscreenQuad,
+      &quad,
       1, 0, "text"
       };
       rl.add({r});
