@@ -25,7 +25,7 @@ Application::Application(const u32 width, const u32 height) : window(width, heig
   textShader = glr::Shader("Text shader", vertSrc, textFragSrc);
   
   fullscreenQuad = glr::Mesh(fullscreenQuadVerts, fullscreenQuadUVs);
-  quad = glr::Mesh(cQuadVerts, orthoQuadUVs);
+  quad = glr::Mesh(ulQuadVerts, orthoQuadUVs);
 }
 
 void Application::addText(const Text& text)
@@ -37,6 +37,8 @@ void Application::run()
 {
   while(!this->exiting)
   {
+    //std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+    
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
@@ -63,16 +65,31 @@ void Application::run()
     glr::RenderList rl;
     for(const auto& text : this->textToRender)
     {
-      glr::Renderable r{{0.0f, 0.0f, 0.0f}, {100, 100, 1}, quat<float>{},
-      &this->fontRasterizer.getFontData(text.fontID).texture,
-      &objectShader,
-      &quad,
-      1, 0, "text"
-      };
-      rl.add({r});
+      FontData& fontData = this->fontRasterizer.getFontData(text.fontID);
+      for(size_t i = 0; i < text.text.size(); i++)
+      {
+        glr::Color charColor;
+        charColor.fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
+        
+        const char& character = text.text[i];
+        vec2 pos = text.penPositions.at(i);
+        vec2 size = fontData.atlas.getTileDimensions(std::string{character});
+        glr::QuadUVs uvs = fontData.atlas.getUVsForTile(std::string{character});
+        
+        glr::Renderable r{{pos.x() - 200, pos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
+        &this->fontRasterizer.getFontData(text.fontID).texture,
+        &textShader,
+        &quad,
+        1, 0, "text",
+        glr::Renderable::CharacterInfo{character, charColor, uvs, "inputColor"}};
+        
+        rl.add({r});
+      }
     }
     this->window.draw(std::move(rl));
     this->window.swapFramebuffer();
-    SDL_Delay(16); //Roughly 60hz refresh
+    SDL_Delay(14);
+    //std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - begin;
+    //printf("%f fps\n", 1.0f / elapsed.count());
   }
 }

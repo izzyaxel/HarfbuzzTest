@@ -29,3 +29,8 @@ inline std::vector<u8> readFile(const std::string& filePath)
   fclose(in);
   return out;
 }
+
+inline float randomFloat()
+{
+  return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+}
