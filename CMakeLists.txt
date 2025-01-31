@@ -62,7 +62,10 @@ set(SOURCE
     src/text/langs/languages.hh
     src/text/langs/textFeatures.cc src/text/langs/textFeatures.hh
     src/text/langs/textLanguage.hh
-    src/shaders.hh)
+    src/shaders.hh
+    src/text/effects.hh
+    src/deltaTime.cc
+    src/deltaTime.hh)
 
 set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc)
 

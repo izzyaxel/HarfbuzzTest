@@ -131,6 +131,8 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   hb_font_destroy(hbFont);
   FT_Done_Face(ftFace);
   FT_Done_FreeType(ftLib);
+  this->currentJitter.resize(this->penPositions.size());
+  this->currentColor.resize(this->penPositions.size());
 }
 
 vec2<u32> TextBlock::getGlyphSize(const char glyph) const
@@ -142,4 +144,11 @@ vec2<u32> TextBlock::getGlyphSize(const char glyph) const
   return this->glyphSizes.at(glyph);
 }
 
+void TextBlock::addTextEffects(std::initializer_list<TextEffect> effects)
+{
+  for(const auto& effect : effects)
+  {
+    this->effects.emplace_back(effect);
+  }
+}
 

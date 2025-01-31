@@ -34,3 +34,8 @@ inline float randomFloat()
 {
   return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }
+
+inline float randomFloat(const float min, const float max)
+{
+  return min + (max - min) * randomFloat();
+}

@@ -21,8 +21,11 @@ constexpr std::array<float, 12> lrQuadVerts{0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 0, 0
 constexpr std::array<float, 12> ulQuadVerts{1, 0, 0, 0, 0, 0, 1, -1, 0, 0, -1, 0};
 constexpr std::array<float, 12> urQuadVerts{0, 0, 0, -1, 0, 0, 0, -1, 0, -1, -1, 0};
 
-Application::Application(const u32 width, const u32 height) : window(width, height)
+Application::Application(const u32 width, const u32 height, const u32 targetFPS) : window(width, height)
 {
+  this->targetFPS = targetFPS;
+  this->deltaTime.setTargetFinder([this]{return 1.0f / (float)this->targetFPS;});
+  
   objectShader = glr::Shader("Object shader", vertSrc, fragSrc);
   textShader = glr::Shader("Text shader", vertSrc, textFragSrc);
   
@@ -39,54 +42,98 @@ void Application::run()
 {
   while(!this->exiting)
   {
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
+    this->deltaTime.update();
+    if(this->deltaTime.isTargetReached())
     {
-      switch(event.type)
+      SDL_Event event;
+      while(SDL_PollEvent(&event))
       {
-        case SDL_QUIT: //Make the menu bar x button close the window
+        switch(event.type)
         {
-          this->exiting = true;
-          break;
-        }
-        case SDL_KEYUP:
-        {
-          if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+          case SDL_QUIT: //Make the menu bar x button close the window
           {
             this->exiting = true;
+            break;
           }
-          break;
+          case SDL_KEYUP:
+          {
+            if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+            {
+              this->exiting = true;
+            }
+            break;
+          }
+          default: break;
         }
-        default: break;
       }
-    }
-    this->window.clearFramebuffer();
+      this->window.clearFramebuffer();
 
-    glr::RenderList rl;
-    for(auto& text : this->textToRender)
-    {
-      for(size_t i = 0; i < text.text.size(); i++)
+      glr::RenderList rl;
+      for(auto& text : this->textToRender)
       {
-        //glr::Color charColor;
-        //charColor.fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
+        for(size_t i = 0; i < text.text.size(); i++)
+        {
+          vec2<float> charPos = text.penPositions.at(i);
+          
+          for(const auto& effect : text.effects)
+          {
+            switch(effect)
+            {
+              case TextEffect::JITTER:
+              {
+                if(this->frames % text.jitterUpdateRate == 0)
+                {
+                  text.currentJitter.at(i) = {randomFloat(-text.jitterAmount, text.jitterAmount), randomFloat(-text.jitterAmount, text.jitterAmount)};
+                }
+                break;
+              }
+              case TextEffect::RAINBOW:
+              {
+                if(this->frames % text.rainbowUpdateRate == 0)
+                {
+                  text.currentColor.at(i).fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
+                }
+                break;
+              }
+              case TextEffect::SOLID_RAINBOW:
+              {
+                if(this->frames % text.rainbowUpdateRate == 0)
+                {
+                  vec3 color = {randomFloat(), randomFloat(), randomFloat()};
+                  for(auto& c : text.currentColor)
+                  {
+                    c.fromRGBAf(color.r(), color.g(), color.b(), 1);
+                  }
+                }
+                break;
+              }
+              case TextEffect::SOLID_RAINBOW_FADE:
+              {
+                
+                break;
+              }
+              default: break;
+            }
+          }
+
+          charPos += text.currentJitter.at(i);
+          const char& character = text.text[i];
+          vec2 size = text.atlas->getTileDimensions(std::string{character});
+          glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
         
-        const char& character = text.text[i];
-        vec2 pos = text.penPositions.at(i);
-        vec2 size = text.atlas->getTileDimensions(std::string{character});
-        glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
+          glr::Renderable r{{charPos.x() - 200, charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
+          &*text.texture,
+          &textShader,
+          &quad,
+          1, 0, "text",
+          glr::Renderable::CharacterInfo{character, text.currentColor.at(i), uvs, "inputColor"}};
         
-        glr::Renderable r{{pos.x() - 200, pos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
-        &*text.texture,
-        &textShader,
-        &quad,
-        1, 0, "text",
-        glr::Renderable::CharacterInfo{character, text.color, uvs, "inputColor"}};
-        
-        rl.add({r});
+          rl.add({r});
+        }
       }
+      this->window.draw(std::move(rl));
+      this->window.swapFramebuffer();
+      this->frames++;
     }
-    this->window.draw(std::move(rl));
-    this->window.swapFramebuffer();
-    SDL_Delay(14);
   }
 }
