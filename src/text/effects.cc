@@ -8,7 +8,7 @@ RainbowEffect::RainbowEffect(const size_t numGlyphs)
   this->currentColor.resize(numGlyphs);
 }
 
-void RainbowEffect::apply(size_t currentGlyph, glr::Color &currentColor)
+void RainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
   if(this->currentColor.size() < currentGlyph)
   {
@@ -23,7 +23,7 @@ SolidRainbowEffect::SolidRainbowEffect(const size_t numGlyphs)
   this->numGlyphs = numGlyphs;
 }
 
-void SolidRainbowEffect::apply(size_t currentGlyph, glr::Color &currentColor)
+void SolidRainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
   
 }
@@ -34,7 +34,7 @@ SolidRainbowFadeEffect::SolidRainbowFadeEffect(const size_t numGlyphs)
   this->numGlyphs = numGlyphs;
 }
 
-void SolidRainbowFadeEffect::apply(size_t currentGlyph, glr::Color &currentColor)
+void SolidRainbowFadeEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
   
 }
@@ -44,10 +44,9 @@ JitterEffect::JitterEffect(const size_t numGlyphs)
 {
   this->numGlyphs = numGlyphs;
   this->currentPosition.resize(numGlyphs);
-  this->effectType = Effect::JITTER;
 }
 
-void JitterEffect::apply(const size_t currentGlyph, vec2<float> &currentPos)
+void JitterEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
   if(this->currentPosition.size() < currentGlyph)
   {

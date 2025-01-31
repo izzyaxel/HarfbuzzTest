@@ -79,45 +79,9 @@ void Application::run()
           
           for(const auto& effect : text.effects)
           {
-            switch(effect->effectType)
+            if(this->frames % effect->updateRate == 0)
             {
-              case Effect::JITTER:
-              {
-                JitterEffect* e = static_cast<JitterEffect*>(effect);
-                if(this->frames % e->updateRate == 0)
-                {
-                  e->apply(i, charPos);
-                }
-                break;
-              }
-              case Effect::RAINBOW:
-              {
-                RainbowEffect* e = static_cast<RainbowEffect*>(effect);
-                if(this->frames % e->updateRate == 0)
-                {
-                  e->apply(i, charColor);
-                }
-                break;
-              }
-              case Effect::SOLID_RAINBOW:
-              {
-                SolidRainbowEffect* e = static_cast<SolidRainbowEffect*>(effect);
-                if(this->frames % e->updateRate == 0)
-                {
-                  e->apply(i, charColor);
-                }
-                break;
-              }
-              case Effect::SOLID_RAINBOW_FADE:
-              {
-                SolidRainbowFadeEffect* e = static_cast<SolidRainbowFadeEffect*>(effect);
-                if(this->frames % e->updateRate == 0)
-                {
-                  e->apply(i, charColor);
-                }
-                break;
-              }
-              default: break;
+              effect->apply(i, charPos, charColor);
             }
           }
 
