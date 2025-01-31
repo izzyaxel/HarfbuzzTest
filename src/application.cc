@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <glrRenderList.hh>
 
+#include "util.hh"
+
 glr::Shader objectShader;
 glr::Shader textShader;
 
@@ -28,17 +30,15 @@ Application::Application(const u32 width, const u32 height) : window(width, heig
   quad = glr::Mesh(ulQuadVerts, orthoQuadUVs);
 }
 
-void Application::addText(const Text& text)
+void Application::addText(TextBlock text)
 {
-  this->textToRender.emplace_back(text);
+  this->textToRender.emplace_back(std::move(text));
 }
 
 void Application::run()
 {
   while(!this->exiting)
   {
-    //std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-    
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
@@ -63,25 +63,24 @@ void Application::run()
     this->window.clearFramebuffer();
 
     glr::RenderList rl;
-    for(const auto& text : this->textToRender)
+    for(auto& text : this->textToRender)
     {
-      FontData& fontData = this->fontRasterizer.getFontData(text.fontID);
       for(size_t i = 0; i < text.text.size(); i++)
       {
-        glr::Color charColor;
-        charColor.fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
+        //glr::Color charColor;
+        //charColor.fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
         
         const char& character = text.text[i];
         vec2 pos = text.penPositions.at(i);
-        vec2 size = fontData.atlas.getTileDimensions(std::string{character});
-        glr::QuadUVs uvs = fontData.atlas.getUVsForTile(std::string{character});
+        vec2 size = text.atlas->getTileDimensions(std::string{character});
+        glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
         
         glr::Renderable r{{pos.x() - 200, pos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
-        &this->fontRasterizer.getFontData(text.fontID).texture,
+        &*text.texture,
         &textShader,
         &quad,
         1, 0, "text",
-        glr::Renderable::CharacterInfo{character, charColor, uvs, "inputColor"}};
+        glr::Renderable::CharacterInfo{character, text.color, uvs, "inputColor"}};
         
         rl.add({r});
       }
@@ -89,7 +88,5 @@ void Application::run()
     this->window.draw(std::move(rl));
     this->window.swapFramebuffer();
     SDL_Delay(14);
-    //std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - begin;
-    //printf("%f fps\n", 1.0f / elapsed.count());
   }
 }
