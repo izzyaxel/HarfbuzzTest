@@ -9,13 +9,13 @@
 #include <glrAtlas.hh>
 #include <unordered_map>
 
+#include "justification.hh"
+
 struct TextBlock
 {
   TextBlock(const std::string& text, const std::vector<u8>& font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features);
   
   vec2<u32> getGlyphSize(char glyph) const;
-
-  void addTextEffects(std::initializer_list<TextEffect> effects);
 
   std::unique_ptr<glr::Atlas> atlas;
   std::unique_ptr<glr::Texture> texture;
@@ -26,15 +26,12 @@ struct TextBlock
   
   std::string text;
   std::string name;
+  vec2<float> pos;
+  u32 lineSpacing = 10;
   u32 pointSize = 0;
   Language language{};
   std::vector<hb_feature_t> features{};
   glr::Color color{};
-  std::vector<TextEffect> effects{};
-  float jitterAmount = 5;
-  u32 rainbowUpdateRate = 1;
-  u32 jitterUpdateRate = 1;
-
-  std::vector<glr::Color> currentColor{};
-  std::vector<vec2<float>> currentJitter{};
+  std::vector<TextEffect*> effects{};
+  Justification justification = Justification::LEFT;
 };

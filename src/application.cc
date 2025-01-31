@@ -73,60 +73,65 @@ void Application::run()
       {
         for(size_t i = 0; i < text.text.size(); i++)
         {
+          //Apply effects
           vec2<float> charPos = text.penPositions.at(i);
+          glr::Color charColor = text.color;
           
           for(const auto& effect : text.effects)
           {
-            switch(effect)
+            switch(effect->effectType)
             {
-              case TextEffect::JITTER:
+              case Effect::JITTER:
               {
-                if(this->frames % text.jitterUpdateRate == 0)
+                JitterEffect* e = static_cast<JitterEffect*>(effect);
+                if(this->frames % e->updateRate == 0)
                 {
-                  text.currentJitter.at(i) = {randomFloat(-text.jitterAmount, text.jitterAmount), randomFloat(-text.jitterAmount, text.jitterAmount)};
+                  e->apply(i, charPos);
                 }
                 break;
               }
-              case TextEffect::RAINBOW:
+              case Effect::RAINBOW:
               {
-                if(this->frames % text.rainbowUpdateRate == 0)
+                RainbowEffect* e = static_cast<RainbowEffect*>(effect);
+                if(this->frames % e->updateRate == 0)
                 {
-                  text.currentColor.at(i).fromRGBAf(randomFloat(), randomFloat(), randomFloat(), 1);
+                  e->apply(i, charColor);
                 }
                 break;
               }
-              case TextEffect::SOLID_RAINBOW:
+              case Effect::SOLID_RAINBOW:
               {
-                if(this->frames % text.rainbowUpdateRate == 0)
+                SolidRainbowEffect* e = static_cast<SolidRainbowEffect*>(effect);
+                if(this->frames % e->updateRate == 0)
                 {
-                  vec3 color = {randomFloat(), randomFloat(), randomFloat()};
-                  for(auto& c : text.currentColor)
-                  {
-                    c.fromRGBAf(color.r(), color.g(), color.b(), 1);
-                  }
+                  e->apply(i, charColor);
                 }
                 break;
               }
-              case TextEffect::SOLID_RAINBOW_FADE:
+              case Effect::SOLID_RAINBOW_FADE:
               {
-                
+                SolidRainbowFadeEffect* e = static_cast<SolidRainbowFadeEffect*>(effect);
+                if(this->frames % e->updateRate == 0)
+                {
+                  e->apply(i, charColor);
+                }
                 break;
               }
               default: break;
             }
           }
 
-          charPos += text.currentJitter.at(i);
-          const char& character = text.text[i];
+          //Construct a renderable for the glyph
+          const char& character = text.text.at(i);
           vec2 size = text.atlas->getTileDimensions(std::string{character});
           glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
         
-          glr::Renderable r{{charPos.x() - 200, charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
+          glr::Renderable r{{text.pos.x() + charPos.x(), text.pos.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
           &*text.texture,
           &textShader,
           &quad,
           1, 0, "text",
-          glr::Renderable::CharacterInfo{character, text.currentColor.at(i), uvs, "inputColor"}};
+          glr::Renderable::CharacterInfo{character, charColor, uvs, "inputColor"}};
         
           rl.add({r});
         }
