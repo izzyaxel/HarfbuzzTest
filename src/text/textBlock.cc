@@ -111,24 +111,23 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   //Calculate pen positions for each glyph
   u32 bufferLength;
   const hb_glyph_position_t* glyphPos = hb_buffer_get_glyph_positions(hbBuffer, &bufferLength);
-  hb_buffer_destroy(hbBuffer);
   double xadv = 0.0, yadv = 0.0;
   for(size_t i = 0; i < bufferLength; i++)
   {
+    const auto& gp = glyphPos[i];
     if(text.at(i) == '\n')
     {
       yadv -= (double)this->tallestGlyph * SCALAR + (double)LINE_SPACING * SCALAR;
       xadv = 0;
-      const auto& gp = glyphPos[i];
       this->penPositions.emplace_back(xadv / SCALAR + gp.x_offset, yadv / SCALAR + gp.y_offset);
       continue;
     }
-    const auto& gp = glyphPos[i];
     this->penPositions.emplace_back(xadv / SCALAR + gp.x_offset, yadv / SCALAR + gp.y_offset);
     xadv += gp.x_advance;
     yadv += gp.y_advance;
   }
-  
+
+  hb_buffer_destroy(hbBuffer);
   hb_font_destroy(hbFont);
   FT_Done_Face(ftFace);
   FT_Done_FreeType(ftLib);
