@@ -71,19 +71,27 @@ void Application::run()
       glr::RenderList rl;
       for(auto& text : this->textToRender)
       {
+        for(auto& effect : text.effects)
+        {
+          if(this->frames % effect.second->updateRate == 0)
+          {
+            vec2 v = {0.0f, 0.0f};
+            effect.second->apply(0, v, text.currentColor);
+          }
+        }
         for(size_t i = 0; i < text.text.size(); i++)
         {
           //Apply effects
           vec2<float> charPos = text.penPositions.at(i);
-          glr::Color charColor = text.color;
-          
+          /*
           for(const auto& effect : text.effects)
           {
-            if(this->frames % effect->updateRate == 0)
+            if(this->frames % effect.second->updateRate == 0)
             {
-              effect->apply(i, charPos, charColor);
+              printf("%zu\n", this->frames);
+              effect.second->apply(i, charPos, text.currentColor);
             }
-          }
+          }*/
 
           //Construct a renderable for the glyph
           const char& character = text.text.at(i);
@@ -95,7 +103,7 @@ void Application::run()
           &textShader,
           &quad,
           1, 0, "text",
-          glr::Renderable::CharacterInfo{character, charColor, uvs, "inputColor"}};
+          glr::Renderable::CharacterInfo{character, text.currentColor, uvs, "inputColor"}};
         
           rl.add({r});
         }

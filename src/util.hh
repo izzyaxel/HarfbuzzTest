@@ -14,3 +14,8 @@ inline std::string cwd = std::filesystem::current_path().string();
 
 std::vector<u8> readFile(const std::string& filePath);
 float randomFloat(float min, float max);
+
+/// 
+/// @param hsv Hue saturation value; hue is 0-360, s & v are 0-1
+/// @return 0-1 RGB
+vec3<float> hsvTorgb(const vec3<float>& hsv);

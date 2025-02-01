@@ -14,7 +14,8 @@ void RainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, gl
   {
     return;
   }
-  
+  this->currentColor.at(currentGlyph).fromRGBAf(randomFloat(0, 1), randomFloat(0, 1), randomFloat(0, 1), 1);
+  currentColor = this->currentColor.at(currentGlyph);
 }
 
 
@@ -25,7 +26,8 @@ SolidRainbowEffect::SolidRainbowEffect(const size_t numGlyphs)
 
 void SolidRainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
-  
+  this->currentColor.fromRGBAf(randomFloat(0, 1), randomFloat(0, 1), randomFloat(0, 1), 1);
+  currentColor = this->currentColor;
 }
 
 
@@ -36,7 +38,14 @@ SolidRainbowFadeEffect::SolidRainbowFadeEffect(const size_t numGlyphs)
 
 void SolidRainbowFadeEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
 {
-  
+  float hue = lerp(0.0f, 360.0f, this->t);
+  vec3<float> rgb = hsvTorgb({hue, 1.0f, 1.0f});
+  currentColor.fromRGBAf(rgb.r(), rgb.g(), rgb.b(), 1);
+  this->t += 0.0001f;
+  if(this->t > 1.0f)
+  {
+    this->t = 0.0f;
+  }
 }
 
 

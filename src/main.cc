@@ -14,8 +14,8 @@ int main()
   
   TextBlock dejaVu32PtText("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, textColor, EnglishLang, {kerningOn, ligaturesOn, contextualLigaturesOn});
   dejaVu32PtText.pos = {-200, 0};
-  std::unique_ptr<JitterEffect> jitterEffect = std::make_unique<JitterEffect>(dejaVu32PtText.text.size());
-  dejaVu32PtText.effects.push_back(jitterEffect.get());
+  ID effect = dejaVu32PtText.addEffect(Effect::SOLID_RAINBOW_FADE);
+  dejaVu32PtText.effects.at(effect)->updateRate = 1;
   
   app.addText(std::move(dejaVu32PtText));
   app.run();

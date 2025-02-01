@@ -17,6 +17,8 @@ struct TextBlock
   
   vec2<u32> getGlyphSize(char glyph) const;
 
+  ID addEffect(Effect effect);
+
   std::unique_ptr<glr::Atlas> atlas;
   std::unique_ptr<glr::Texture> texture;
   
@@ -32,6 +34,11 @@ struct TextBlock
   Language language{};
   std::vector<hb_feature_t> features{};
   glr::Color color{};
-  std::vector<TextEffect*> effects{};
+  std::unordered_map<ID, std::unique_ptr<TextEffect>> effects{};
   Justification justification = Justification::LEFT;
+
+  glr::Color currentColor{};
+
+  private:
+  ID lastEffectID = 0;
 };

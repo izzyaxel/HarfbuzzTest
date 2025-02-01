@@ -3,6 +3,14 @@
 #include "glrColor.hh"
 #include "../util.hh"
 
+enum struct Effect
+{
+  RAINBOW,
+  SOLID_RAINBOW,
+  SOLID_RAINBOW_FADE,
+  JITTER,
+};
+
 struct TextEffect
 {
   virtual ~TextEffect() = default;
@@ -18,7 +26,7 @@ struct RainbowEffect : TextEffect
   void apply(size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor) override;
   
   size_t numGlyphs = 1;
-  std::vector<vec2<float>> currentColor;
+  std::vector<glr::Color> currentColor;
 };
 
 /// All glyphs are the same random color
@@ -28,6 +36,7 @@ struct SolidRainbowEffect : TextEffect
   void apply(size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor) override;
   
   size_t numGlyphs = 1;
+  glr::Color currentColor;
 };
 
 /// All glyphs are the same color, and the color does a rainbow fade
@@ -37,6 +46,8 @@ struct SolidRainbowFadeEffect : TextEffect
   void apply(size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor) override;
 
   size_t numGlyphs = 1;
+  glr::Color currentColor;
+  float t = 0.0f;
 };
 
 /// Each glyph moves around a random amount

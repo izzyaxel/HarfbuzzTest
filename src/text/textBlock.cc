@@ -141,3 +141,33 @@ vec2<u32> TextBlock::getGlyphSize(const char glyph) const
   }
   return this->glyphSizes.at(glyph);
 }
+
+ID TextBlock::addEffect(const Effect effect)
+{
+  const ID out = this->lastEffectID;
+  this->lastEffectID++;
+  switch(effect)
+  {
+    case Effect::JITTER:
+    {
+      this->effects[out] = std::make_unique<JitterEffect>(this->text.length());
+      break;
+    }
+    case Effect::RAINBOW:
+    {
+      this->effects[out] = std::make_unique<RainbowEffect>(this->text.length());
+      break;
+    }
+    case Effect::SOLID_RAINBOW:
+    {
+      this->effects[out] = std::make_unique<SolidRainbowEffect>(this->text.length());
+      break;
+    }
+    case Effect::SOLID_RAINBOW_FADE:
+    {
+      this->effects[out] = std::make_unique<SolidRainbowFadeEffect>(this->text.length());
+      break;
+    }
+  }
+  return out;
+}
