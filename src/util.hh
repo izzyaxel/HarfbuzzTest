@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <random>
 
+inline constexpr ID INVALID_ID = std::numeric_limits<ID>::max();
 inline constexpr float SCALAR = 64.0f;
 inline std::default_random_engine generator;
 inline std::string cwd = std::filesystem::current_path().string();

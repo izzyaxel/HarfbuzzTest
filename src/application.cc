@@ -33,9 +33,9 @@ Application::Application(const u32 width, const u32 height, const u32 targetFPS)
   quad = glr::Mesh(ulQuadVerts, orthoQuadUVs);
 }
 
-void Application::addText(TextBlock text)
+void Application::addTextToRender(const ID text)
 {
-  this->textToRender.emplace_back(std::move(text));
+  this->textToRender.emplace_back(text);
 }
 
 void Application::run()
@@ -68,32 +68,51 @@ void Application::run()
       }
       this->window.clearFramebuffer();
 
+      //Render text
       glr::RenderList rl;
-      for(auto& text : this->textToRender)
+      for(const ID entity : this->textToRender)
       {
-        for(auto& effect : text.effects)
+        TextBlock& text = this->textECS.getText(entity);
+
+        if(this->textECS.hasSolidRainbowEffect(entity))
         {
-          if(this->frames % effect.second->updateRate == 0)
+          SolidRainbowEffect& effect = this->textECS.getSolidRainbowEffect(entity);
+          if(this->frames % effect.updateRate == 0)
           {
-            vec2 v = {0.0f, 0.0f};
-            effect.second->apply(0, v, text.currentColor);
+            effect.apply(text.currentColor, this->deltaTime.deltaF);
           }
         }
+        if(this->textECS.hasSolidRainbowFadeEffect(entity))
+        {
+          SolidRainbowFadeEffect& effect = this->textECS.getSolidRainbowFadeEffect(entity);
+          if(this->frames % effect.updateRate == 0)
+          {
+            effect.apply(text.currentColor, this->deltaTime.deltaF);
+          }
+        }
+        
         for(size_t i = 0; i < text.text.size(); i++)
         {
-          //Apply effects
           vec2<float> charPos = text.penPositions.at(i);
-          /*
-          for(const auto& effect : text.effects)
-          {
-            if(this->frames % effect.second->updateRate == 0)
-            {
-              printf("%zu\n", this->frames);
-              effect.second->apply(i, charPos, text.currentColor);
-            }
-          }*/
 
-          //Construct a renderable for the glyph
+          if(this->textECS.hasJitterEffect(entity))
+          {
+            JitterEffect& effect = this->textECS.getJitterEffect(entity);
+            if(this->frames % effect.updateRate == 0)
+            {
+              effect.apply(i, charPos, this->deltaTime.deltaF);
+            }
+          }
+          if(this->textECS.hasRainbowEffect(entity))
+          {
+            RainbowEffect& effect = this->textECS.getRainbowEffect(entity);
+            if(this->frames % effect.updateRate == 0)
+            {
+              effect.apply(i, text.currentColor, this->deltaTime.deltaF);
+            }
+          }
+
+          //TODO FIXME position/color data persistence when effects are active but updateRate is not 1
           const char& character = text.text.at(i);
           vec2 size = text.atlas->getTileDimensions(std::string{character});
           glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
@@ -104,7 +123,7 @@ void Application::run()
           &quad,
           1, 0, "text",
           glr::Renderable::CharacterInfo{character, text.currentColor, uvs, "inputColor"}};
-        
+          
           rl.add({r});
         }
       }

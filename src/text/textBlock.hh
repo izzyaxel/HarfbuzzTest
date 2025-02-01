@@ -13,11 +13,10 @@
 
 struct TextBlock
 {
+  TextBlock() = default;
   TextBlock(const std::string& text, const std::vector<u8>& font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features);
   
   vec2<u32> getGlyphSize(char glyph) const;
-
-  ID addEffect(Effect effect);
 
   std::unique_ptr<glr::Atlas> atlas;
   std::unique_ptr<glr::Texture> texture;
@@ -28,13 +27,11 @@ struct TextBlock
   
   std::string text;
   std::string name;
-  vec2<float> pos;
+  vec2<float> pos{};
   u32 lineSpacing = 10;
   u32 pointSize = 0;
   Language language{};
   std::vector<hb_feature_t> features{};
-  glr::Color color{};
-  std::unordered_map<ID, std::unique_ptr<TextEffect>> effects{};
   Justification justification = Justification::LEFT;
 
   glr::Color currentColor{};

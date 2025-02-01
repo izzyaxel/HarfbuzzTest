@@ -4,11 +4,10 @@
 
 RainbowEffect::RainbowEffect(const size_t numGlyphs)
 {
-  this->numGlyphs = numGlyphs;
   this->currentColor.resize(numGlyphs);
 }
 
-void RainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
+void RainbowEffect::apply(const size_t currentGlyph, glr::Color& currentColor, const float deltaTime)
 {
   if(this->currentColor.size() < currentGlyph)
   {
@@ -18,25 +17,13 @@ void RainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, gl
   currentColor = this->currentColor.at(currentGlyph);
 }
 
-
-SolidRainbowEffect::SolidRainbowEffect(const size_t numGlyphs)
-{
-  this->numGlyphs = numGlyphs;
-}
-
-void SolidRainbowEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
+void SolidRainbowEffect::apply(glr::Color& currentColor, const float deltaTime)
 {
   this->currentColor.fromRGBAf(randomFloat(0, 1), randomFloat(0, 1), randomFloat(0, 1), 1);
   currentColor = this->currentColor;
 }
 
-
-SolidRainbowFadeEffect::SolidRainbowFadeEffect(const size_t numGlyphs)
-{
-  this->numGlyphs = numGlyphs;
-}
-
-void SolidRainbowFadeEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
+void SolidRainbowFadeEffect::apply(glr::Color& currentColor, const float deltaTime)
 {
   float hue = lerp(0.0f, 360.0f, this->t);
   vec3<float> rgb = hsvTorgb({hue, 1.0f, 1.0f});
@@ -48,14 +35,12 @@ void SolidRainbowFadeEffect::apply(const size_t currentGlyph, vec2<float>& curre
   }
 }
 
-
 JitterEffect::JitterEffect(const size_t numGlyphs)
 {
-  this->numGlyphs = numGlyphs;
   this->currentPosition.resize(numGlyphs);
 }
 
-void JitterEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, glr::Color& currentColor)
+void JitterEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, const float deltaTime)
 {
   if(this->currentPosition.size() < currentGlyph)
   {

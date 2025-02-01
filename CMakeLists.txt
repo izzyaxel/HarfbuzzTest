@@ -65,7 +65,9 @@ set(SOURCE
         src/text/textBlock.cc src/text/textBlock.hh
         src/text/langs/languages.hh
         src/text/langs/textLanguage.hh
-        src/text/langs/textFeatures.cc src/text/langs/textFeatures.hh)
+        src/text/langs/textFeatures.cc src/text/langs/textFeatures.hh
+        src/textEcs.cc
+        src/textEcs.hh)
 
 set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc)
 

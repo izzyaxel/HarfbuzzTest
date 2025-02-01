@@ -10,14 +10,16 @@ int main()
   const std::vector<u8> dejaVuSansFile = readFile(cwd + "/fonts/DejaVuSans.ttf");
 
   glr::Color textColor;
-  textColor.fromRGBAf(0, 0, 0, 1);
+  textColor.fromRGBAf(1, 1, 1, 1);
+
+  const ID dejaVuText = app.textECS.newEntity("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, textColor, EnglishLang, {kerningOn});
+  app.textECS.getText(dejaVuText).pos.x() = -200;
+  app.textECS.addJitterEffect(dejaVuText);
+  app.textECS.addSolidRainbowFadeEffect(dejaVuText);
+
+  app.textECS.getJitterEffect(dejaVuText).updateRate = 20;
   
-  TextBlock dejaVu32PtText("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, textColor, EnglishLang, {kerningOn, ligaturesOn, contextualLigaturesOn});
-  dejaVu32PtText.pos = {-200, 0};
-  ID effect = dejaVu32PtText.addEffect(Effect::SOLID_RAINBOW_FADE);
-  dejaVu32PtText.effects.at(effect)->updateRate = 1;
-  
-  app.addText(std::move(dejaVu32PtText));
+  app.addTextToRender(dejaVuText);
   app.run();
   return 0;
 }

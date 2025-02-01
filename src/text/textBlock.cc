@@ -17,8 +17,8 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   this->pointSize = pointSize;
   this->language = language;
   this->features = features;
-  this->color = color;
-
+  this->currentColor = color;
+  
   this->texture = std::make_unique<glr::Texture>();
   this->atlas = std::make_unique<glr::Atlas>();
 
@@ -140,34 +140,4 @@ vec2<u32> TextBlock::getGlyphSize(const char glyph) const
     return {};
   }
   return this->glyphSizes.at(glyph);
-}
-
-ID TextBlock::addEffect(const Effect effect)
-{
-  const ID out = this->lastEffectID;
-  this->lastEffectID++;
-  switch(effect)
-  {
-    case Effect::JITTER:
-    {
-      this->effects[out] = std::make_unique<JitterEffect>(this->text.length());
-      break;
-    }
-    case Effect::RAINBOW:
-    {
-      this->effects[out] = std::make_unique<RainbowEffect>(this->text.length());
-      break;
-    }
-    case Effect::SOLID_RAINBOW:
-    {
-      this->effects[out] = std::make_unique<SolidRainbowEffect>(this->text.length());
-      break;
-    }
-    case Effect::SOLID_RAINBOW_FADE:
-    {
-      this->effects[out] = std::make_unique<SolidRainbowFadeEffect>(this->text.length());
-      break;
-    }
-  }
-  return out;
 }
