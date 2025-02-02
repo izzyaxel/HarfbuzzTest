@@ -3,6 +3,7 @@
 #include "deltaTime.hh"
 #include "textEcs.hh"
 #include "text/textBlock.hh"
+#include "text/langs/textFeatures.hh"
 #include "window.hh"
 
 struct Application

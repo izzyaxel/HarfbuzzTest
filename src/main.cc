@@ -1,6 +1,4 @@
 #include "application.hh"
-#include "util.hh"
-#include "text/langs/textFeatures.hh"
 
 int main()
 {
