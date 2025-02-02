@@ -27,7 +27,7 @@ struct TextBlock
   
   std::string text;
   std::string name;
-  vec2<float> pos{};
+  vec2<float> position{};
   u32 lineSpacing = 10;
   u32 pointSize = 0;
   Language language{};

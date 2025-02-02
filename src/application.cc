@@ -73,19 +73,19 @@ void Application::run()
       glr::RenderList rl;
       for(const ID entity : this->textToRender)
       {
-        TextBlock& text = this->textECS.getText(entity);
+        TextBlock& text = this->ecs.getText(entity);
 
-        if(this->textECS.hasSolidRainbowEffect(entity))
+        if(this->ecs.hasSolidRainbowEffect(entity))
         {
-          SolidRainbowEffect& effect = this->textECS.getSolidRainbowEffect(entity);
+          SolidRainbowEffect& effect = this->ecs.getSolidRainbowEffect(entity);
           if(this->frames % effect.updateRate == 0)
           {
             effect.apply(text.currentColor, this->deltaTime.deltaF);
           }
         }
-        if(this->textECS.hasSolidRainbowFadeEffect(entity))
+        if(this->ecs.hasSolidRainbowFadeEffect(entity))
         {
-          SolidRainbowFadeEffect& effect = this->textECS.getSolidRainbowFadeEffect(entity);
+          SolidRainbowFadeEffect& effect = this->ecs.getSolidRainbowFadeEffect(entity);
           if(this->frames % effect.updateRate == 0)
           {
             effect.apply(text.currentColor, this->deltaTime.deltaF);
@@ -96,25 +96,25 @@ void Application::run()
         {
           vec2<float> charPos = text.penPositions.at(i);
 
-          if(this->textECS.hasJitterEffect(entity))
+          if(this->ecs.hasJitterEffect(entity))
           {
-            JitterEffect& effect = this->textECS.getJitterEffect(entity);
+            JitterEffect& effect = this->ecs.getJitterEffect(entity);
             if(this->frames % effect.updateRate == 0)
             {
               effect.apply(i, charPos, this->deltaTime.deltaF);
             }
           }
-          if(this->textECS.hasRainbowEffect(entity))
+          if(this->ecs.hasRainbowEffect(entity))
           {
-            RainbowEffect& effect = this->textECS.getRainbowEffect(entity);
+            RainbowEffect& effect = this->ecs.getRainbowEffect(entity);
             if(this->frames % effect.updateRate == 0)
             {
               effect.apply(i, text.currentColor, this->deltaTime.deltaF);
             }
           }
-          if(this->textECS.hasRainbowWaveEffect(entity))
+          if(this->ecs.hasRainbowWaveEffect(entity))
           {
-            RainbowWaveEffect& effect = this->textECS.getRainbowWaveEffect(entity);
+            RainbowWaveEffect& effect = this->ecs.getRainbowWaveEffect(entity);
             if(this->frames % effect.updateRate == 0)
             {
               effect.apply(i, text.currentColor, this->deltaTime.deltaF);
@@ -131,7 +131,7 @@ void Application::run()
             charPos.y() -= 7;
           }
           
-          glr::Renderable r{{text.pos.x() + charPos.x(), text.pos.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
+          glr::Renderable r{{text.position.x() + charPos.x(), text.position.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
           &*text.texture,
           &textShader,
           &quad,

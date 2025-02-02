@@ -12,7 +12,7 @@ struct Application
   void addTextToRender(ID text);
   void run();
 
-  TextECS textECS;
+  TextECS ecs;
   Window window;
   bool exiting = false;
   u32 targetFPS = 0;

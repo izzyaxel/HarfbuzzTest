@@ -9,13 +9,11 @@ int main()
   const std::vector<u8> hackRegularFile = readFile(cwd + "/fonts/Hack-Regular.ttf");
   const std::vector<u8> dejaVuSansFile = readFile(cwd + "/fonts/DejaVuSans.ttf");
 
-  glr::Color textColor;
-  textColor.fromRGBAf(1, 1, 1, 1);
-
-  const ID dejaVuText = app.textECS.newEntity("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, textColor, EnglishLang, {kerningOn});
-  app.textECS.getText(dejaVuText).pos.x() = -200;
+  const ID dejaVuText = app.ecs.newEntity("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, {}, EnglishLang, {kerningOn});
+  app.ecs.getText(dejaVuText).currentColor.fromRGBAf(1, 1, 1, 1);
+  app.ecs.getText(dejaVuText).position.x() = -200;
   
-  app.textECS.addRainbowWaveEffect(dejaVuText);
+  app.ecs.addRainbowWaveEffect(dejaVuText);
   
   //app.textECS.addJitterEffect(dejaVuText);
   //app.textECS.getJitterEffect(dejaVuText).updateRate = 20;
