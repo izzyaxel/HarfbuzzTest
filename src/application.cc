@@ -126,10 +126,11 @@ void Application::run()
           vec2 size = text.atlas->getTileDimensions(std::string{character});
           glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
 
-          if(character == 'p' || character == 'y' || character == 'q' || character == 'j' || character == 'g')
+          //TODO FIXME this shouldn't need to exist, hb_shape should be giving y offsets but isn't
+          /*if(character == 'p' || character == 'y' || character == 'q' || character == 'j' || character == 'g')
           {
             charPos.y() -= 7;
-          }
+          }*/
           
           glr::Renderable r{{text.position.x() + charPos.x(), text.position.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
           &*text.texture,

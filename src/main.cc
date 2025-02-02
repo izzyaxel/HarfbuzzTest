@@ -13,8 +13,8 @@ int main()
   
   app.ecs.addRainbowWaveEffect(dejaVuText);
   
-  app.ecs.addJitterEffect(dejaVuText);
-  app.ecs.getJitterEffect(dejaVuText).amount = 2;
+  //app.ecs.addJitterEffect(dejaVuText);
+  //app.ecs.getJitterEffect(dejaVuText).amount = 2;
   //app.ecs.getJitterEffect(dejaVuText).updateRate = 20;
   
   app.addTextToRender(dejaVuText);
