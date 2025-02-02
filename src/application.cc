@@ -45,6 +45,7 @@ void Application::run()
     this->deltaTime.update();
     if(this->deltaTime.isTargetReached())
     {
+      this->deltaTime.onTargetReached();
       SDL_Event event;
       while(SDL_PollEvent(&event))
       {
@@ -91,7 +92,7 @@ void Application::run()
           }
         }
         
-        for(size_t i = 0; i < text.text.size(); i++)
+        for(size_t i = 0; i < text.text.length(); i++)
         {
           vec2<float> charPos = text.penPositions.at(i);
 
@@ -111,12 +112,25 @@ void Application::run()
               effect.apply(i, text.currentColor, this->deltaTime.deltaF);
             }
           }
+          if(this->textECS.hasRainbowWaveEffect(entity))
+          {
+            RainbowWaveEffect& effect = this->textECS.getRainbowWaveEffect(entity);
+            if(this->frames % effect.updateRate == 0)
+            {
+              effect.apply(i, text.currentColor, this->deltaTime.deltaF);
+            }
+          }
 
           //TODO FIXME position/color data persistence when effects are active but updateRate is not 1
           const char& character = text.text.at(i);
           vec2 size = text.atlas->getTileDimensions(std::string{character});
           glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
-        
+
+          if(character == 'p' || character == 'y' || character == 'q' || character == 'j' || character == 'g')
+          {
+            charPos.y() -= 7;
+          }
+          
           glr::Renderable r{{text.pos.x() + charPos.x(), text.pos.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
           &*text.texture,
           &textShader,

@@ -16,7 +16,7 @@ void TextECS::addJitterEffect(const ID entity)
 
 void TextECS::addRainbowEffect(const ID entity)
 {
-  this->rainbowEffects[entity]= RainbowEffect(this->textBlocks.at(entity).text.length());
+  this->rainbowEffects[entity] = RainbowEffect(this->textBlocks.at(entity).text.length());
 }
 
 void TextECS::addSolidRainbowEffect(const ID entity)
@@ -27,6 +27,11 @@ void TextECS::addSolidRainbowEffect(const ID entity)
 void TextECS::addSolidRainbowFadeEffect(const ID entity)
 {
   this->solidRainbowFadeEffects[entity];
+}
+
+void TextECS::addRainbowWaveEffect(const ID entity)
+{
+  this->rainbowWaveEffects[entity] = RainbowWaveEffect(this->textBlocks.at(entity).text.length());
 }
 
 TextBlock& TextECS::getText(const ID entity)
@@ -54,6 +59,10 @@ SolidRainbowFadeEffect& TextECS::getSolidRainbowFadeEffect(const ID entity)
   return this->solidRainbowFadeEffects.at(entity);
 }
 
+RainbowWaveEffect& TextECS::getRainbowWaveEffect(const ID entity)
+{
+  return this->rainbowWaveEffects.at(entity);
+}
 
 bool TextECS::hasJitterEffect(const ID entity)
 {
@@ -75,3 +84,7 @@ bool TextECS::hasSolidRainbowFadeEffect(const ID entity)
   return this->solidRainbowFadeEffects.contains(entity);
 }
 
+bool TextECS::hasRainbowWaveEffect(const ID entity)
+{
+  return this->rainbowWaveEffects.contains(entity);
+}

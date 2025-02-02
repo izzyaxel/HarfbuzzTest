@@ -33,6 +33,19 @@ struct SolidRainbowFadeEffect
   float t = 0.0f;
 };
 
+struct RainbowWaveEffect
+{
+  RainbowWaveEffect() = default;
+  explicit RainbowWaveEffect(size_t numGlyphs);
+  void apply(size_t currentGlyph, glr::Color& currentColor, float deltaTime);
+
+  float gradientLength = 60; //1-360, how much of the spectrum is visible at once within the block of text, inverse scale
+  float saturation = 1.0f; //0-1
+  float brightness = 1.0f; //0-1
+  u32 updateRate = 1;
+  std::vector<float> currentT{};
+};
+
 /// Each glyph moves around a random amount
 struct JitterEffect
 {

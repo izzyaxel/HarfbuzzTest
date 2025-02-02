@@ -14,10 +14,11 @@ int main()
 
   const ID dejaVuText = app.textECS.newEntity("The quick brown fox jumped\nover the lazy doggo", dejaVuSansFile, "DejaVu Sans", 32, textColor, EnglishLang, {kerningOn});
   app.textECS.getText(dejaVuText).pos.x() = -200;
-  app.textECS.addJitterEffect(dejaVuText);
-  app.textECS.addSolidRainbowFadeEffect(dejaVuText);
-
-  app.textECS.getJitterEffect(dejaVuText).updateRate = 20;
+  
+  app.textECS.addRainbowWaveEffect(dejaVuText);
+  
+  //app.textECS.addJitterEffect(dejaVuText);
+  //app.textECS.getJitterEffect(dejaVuText).updateRate = 20;
   
   app.addTextToRender(dejaVuText);
   app.run();
