@@ -100,6 +100,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   //Shape text
   //Create a buffer and configure it for shaping
   hb_buffer_t* hbBuffer = hb_buffer_create();
+  hb_buffer_set_unicode_funcs(hbBuffer, hb_unicode_funcs_get_default());
   hb_buffer_set_script(hbBuffer, this->language.script);
   hb_buffer_set_direction(hbBuffer, this->language.direction);
   hb_buffer_set_language(hbBuffer, hb_language_from_string(this->language.lang.c_str(), -1));
@@ -115,6 +116,8 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   //Calculate pen positions for each glyph
   u32 bufferLength;
   hb_glyph_position_t* glyphPos = hb_buffer_get_glyph_positions(hbBuffer, &bufferLength);
+  u32 glyphCount;
+  hb_glyph_info_t* glyphInfo = hb_buffer_get_glyph_infos(hbBuffer, &glyphCount);
   i32 xScale;
   i32 yScale;
   hb_font_get_scale(hbFont, &xScale, &yScale);
@@ -125,6 +128,13 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   for(size_t i = 0; i < bufferLength; i++)
   {
     auto& gp = glyphPos[i];
+    printf("%c: xAdv: %u, xOff: %u, yAdv: %u, yOff: %u\n", text.at(i), gp.x_advance, gp.x_offset, gp.y_advance, gp.y_offset);
+
+    gp.x_offset *= xScale / (i32)upem;
+    gp.y_offset *= yScale / (i32)upem;
+    gp.x_advance *= xScale / (i32)upem;
+    gp.y_advance *= yScale / (i32)upem;
+    
     if(text.at(i) == '\n')
     {
       yadv -= (double)this->tallestGlyph * SCALAR + (double)this->lineSpacing * SCALAR;
@@ -132,12 +142,6 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
       this->penPositions.emplace_back(xadv / SCALAR + gp.x_offset, yadv / SCALAR + gp.y_offset);
       continue;
     }
-    
-    //printf("%c: xAdv: %u, xOff: %u, yAdv: %u, yOff: %u\n", text.at(i), gp.x_advance, gp.x_offset, gp.y_advance, gp.y_offset);
-    gp.x_offset *= xScale / (i32)upem; //TODO scale and upem are always 2048 so this does nothing
-    gp.y_offset += yScale / (i32)upem;
-    gp.x_advance *= xScale / (i32)upem;
-    gp.y_advance *= yScale / (i32)upem;
 
     //TODO FIXME y advance and offset are always 0
     this->penPositions.emplace_back(xadv / SCALAR + gp.x_offset, yadv / SCALAR + gp.y_offset);
