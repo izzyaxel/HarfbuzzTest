@@ -1,11 +1,24 @@
 #include "textEcs.hh"
 
-ID TextECS::newEntity(const std::string& text, const std::vector<u8>& font, const std::string& fontName, const u32 pointSize, const glr::Color color, const Language& language, const std::vector<hb_feature_t>& features)
+ID TextECS::newEntity(const std::string& text, const ID font, const std::string& fontName, const u32 pointSize, const glr::Color color, const Language& language, const std::vector<hb_feature_t>& features)
 {
+  if(!this->fontFiles.contains(font))
+  {
+    return INVALID_ID;
+  }
+  
   const ID out = this->lastEntity;
   this->lastEntity++;
   this->entities.emplace_back(out);
-  this->textBlocks[out] = TextBlock(text, font, fontName, pointSize, color, language, features);
+  this->textBlocks[out] = TextBlock(text, this->fontFiles.at(font), fontName, pointSize, color, language, features);
+  return out;
+}
+
+ID TextECS::newFontFile(const std::string &filePath)
+{
+  const ID out = this->lastFontFile;
+  this->lastFontFile++;
+  this->fontFiles[out] = readFile(filePath);
   return out;
 }
 

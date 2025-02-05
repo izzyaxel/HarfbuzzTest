@@ -5,7 +5,9 @@
 
 struct TextECS
 {
-  ID newEntity(const std::string& text, const std::vector<u8>& font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features);
+  ID newEntity(const std::string& text, ID font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features);
+
+  ID newFontFile(const std::string& filePath);
   
   void addJitterEffect(ID entity);
   void addWaveEffect(ID entity);
@@ -31,6 +33,7 @@ struct TextECS
 
   private:
   std::vector<ID> entities{};
+  std::unordered_map<ID, std::vector<u8>> fontFiles{};
   std::unordered_map<ID, TextBlock> textBlocks{};
   std::unordered_map<ID, JitterEffect> jitterEffects{};
   std::unordered_map<ID, WaveEffect> waveEffects{};
@@ -40,4 +43,5 @@ struct TextECS
   std::unordered_map<ID, RainbowWaveEffect> rainbowWaveEffects{};
 
   ID lastEntity = 0;
+  ID lastFontFile = 0;
 };

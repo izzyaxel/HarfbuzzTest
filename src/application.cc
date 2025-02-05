@@ -56,7 +56,12 @@ void Application::run()
   }
 }
 
-ID Application::newEntity(const std::string &text, const std::vector<u8> &font, const std::string &fontName, u32 pointSize, glr::Color color, const Language &language, const std::vector<hb_feature_t> &features) const
+ID Application::newFont(const std::string &filePath) const
+{
+  return this->textRenderer->ecs.newFontFile(filePath);
+}
+
+ID Application::newEntity(const std::string &text, const ID font, const std::string &fontName, u32 pointSize, glr::Color color, const Language &language, const std::vector<hb_feature_t> &features) const
 {
   return this->textRenderer->ecs.newEntity(text, font, fontName, pointSize, color, language, features);
 }

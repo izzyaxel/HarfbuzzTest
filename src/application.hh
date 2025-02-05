@@ -10,9 +10,10 @@ struct Application
   Application(u32 width, u32 height, u32 targetFPS);
   
   void run();
-
+  
   //Forwarding
-  ID newEntity(const std::string& text, const std::vector<u8>& font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features) const;
+  ID newFont(const std::string& filePath) const;
+  ID newEntity(const std::string& text, ID font, const std::string& fontName, u32 pointSize, glr::Color color, const Language& language, const std::vector<hb_feature_t>& features) const;
   
   void addJitterEffect(ID entity) const;
   void addWaveEffect(ID entity) const;
