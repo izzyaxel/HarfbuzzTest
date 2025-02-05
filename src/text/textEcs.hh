@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util.hh"
-#include "text/textBlock.hh"
+#include "../util.hh"
+#include "textBlock.hh"
 
 struct TextECS
 {

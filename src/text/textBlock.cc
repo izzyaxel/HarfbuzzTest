@@ -7,8 +7,33 @@
 
 TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const std::string& fontName, const u32 pointSize, const glr::Color color, const Language& language, const std::vector<hb_feature_t>& features)
 {
-  if(font.empty() || pointSize == 0 || text.empty() || language.lang.empty() || language.script == HB_SCRIPT_UNKNOWN)
+  if(font.empty())
   {
+    printf("TextBlock(): Font file was empty\n");
+    return;
+  }
+
+  if(pointSize == 0)
+  {
+    printf("TextBlock(): Point size cannot be 0\n");
+    return;
+  }
+
+  if(text.empty())
+  {
+    printf("TextBlock(): No text was provided\n");
+    return;
+  }
+
+  if(language.lang.empty())
+  {
+    printf("TextBlock(): No language was provided\n");
+    return;
+  }
+
+  if(language.script == HB_SCRIPT_UNKNOWN)
+  {
+    printf("TextBlock(): No script was provided\n");
     return;
   }
   
@@ -18,11 +43,10 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   this->language = language;
   this->features = features;
   this->currentColor = color;
-  
   this->texture = std::make_unique<glr::Texture>();
   this->atlas = std::make_unique<glr::Atlas>();
 
-  //Rasterize
+  //Rasterize the font with Freetype to an OpenGL texture atlas
   //Start FreeType
   FT_Library ftLib = nullptr;
   FT_Face ftFace = nullptr;
@@ -30,7 +54,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   FT_Error ftError = FT_Init_FreeType(&ftLib);
   if(ftError != 0 || !ftLib)
   {
-    printf("rasterizeFont: Freetype failed to initialize\n");
+    printf("TextBlock(): Freetype failed to initialize\n");
     return;
   }
 
@@ -38,7 +62,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   ftError = FT_New_Memory_Face(ftLib, font.data(), (long)font.size(), 0, &ftFace);
   if(ftError != 0)
   {
-    printf("rasterizeFont: Freetype failed to load font\n");
+    printf("TextBlock(): Freetype failed to load font\n");
     return;
   }
 
@@ -46,7 +70,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   ftError = FT_Set_Char_Size(ftFace, (long)(SCALAR * (float)this->pointSize), (long)(SCALAR * (float)this->pointSize), 0, 0);
   if(ftError != 0)
   {
-    printf("rasterizeFont: Freetype failed to set font size\n");
+    printf("TextBlock(): Freetype failed to set font size\n");
     return;
   }
 
@@ -54,7 +78,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   hbFont = hb_ft_font_create_referenced(ftFace);
   if(!hbFont)
   {
-    printf("rasterizeFont: Harfbuzz failed to create a font from the Freetype font\n");
+    printf("TextBlock(): Harfbuzz failed to create a font from the Freetype font\n");
     return;
   }
 
@@ -83,7 +107,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
       this->tallestGlyph = this->glyphSizes.at(i).y();
     }
 
-    //Put the glyph's bitmap into the BSP tree for packing into the texture atlas
+    //Put the glyph's bitmap into a BSP tree for efficient packing into the texture atlas
     std::vector next(g->bitmap.buffer, g->bitmap.buffer + w * h);
     if(next.empty())
     {
@@ -97,7 +121,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   glr::pixelStoreiUnpack(1);
   this->atlas->finalize(this->name + " " + std::to_string(this->pointSize) + "pt", *this->texture, glr::TexColorFormat::GREY);
   
-  //Shape text
+  //Shape the text and apply justification and newlines
   //Create a buffer and configure it for shaping
   hb_buffer_t* hbBuffer = hb_buffer_create();
   hb_buffer_set_unicode_funcs(hbBuffer, hb_unicode_funcs_get_default());
@@ -109,7 +133,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   hb_shape(hbFont, hbBuffer, this->features.data(), this->features.size());
   if(hb_buffer_get_content_type(hbBuffer) != HB_BUFFER_CONTENT_TYPE_GLYPHS)
   {
-    printf("shapeText: Failed to shape text: %s, %upt, \"%s\"\n", this->name.c_str(), this->pointSize, text.c_str());
+    printf("TextBlock(): Failed to shape text: %s, %upt, \"%s\"\n", this->name.c_str(), this->pointSize, text.c_str());
     return;
   }
   
@@ -124,12 +148,15 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   const u32 upem = hb_face_get_upem(hb_font_get_face(hbFont));
   double xadv = 0.0;
   double yadv = 0.0;
-  
+
+  //TODO justification
   for(size_t i = 0; i < bufferLength; i++)
   {
     auto& gp = glyphPos[i];
-    printf("%c: xAdv: %u, xOff: %u, yAdv: %u, yOff: %u\n", text.at(i), gp.x_advance, gp.x_offset, gp.y_advance, gp.y_offset);
-
+    
+    //printf("%c: xAdv: %u, xOff: %u, yAdv: %u, yOff: %u\n", text.at(i), gp.x_advance, gp.x_offset, gp.y_advance, gp.y_offset);
+    
+    //DPI awareness?
     gp.x_offset *= xScale / (i32)upem;
     gp.y_offset *= yScale / (i32)upem;
     gp.x_advance *= xScale / (i32)upem;

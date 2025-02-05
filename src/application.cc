@@ -1,41 +1,20 @@
 #include "application.hh"
-#include "shaders.hh"
 
 #include <SDL2/SDL.h>
 #include <glrRenderList.hh>
 
-#include "util.hh"
-
-glr::Shader objectShader;
-glr::Shader textShader;
-
-glr::Mesh fullscreenQuad;
-glr::Mesh quad;
-
-constexpr std::array<float, 8>  fullscreenQuadUVs{1, 0, 1, 1, 0, 0, 0, 1};
-constexpr std::array<float, 12> fullscreenQuadVerts{1, -1, 0, 1, 1, 0, -1, -1, 0, -1, 1, 0};
-constexpr std::array<float, 8>  orthoQuadUVs{1, 0, 0, 0, 1, 1, 0, 1};
-constexpr std::array<float, 12> cQuadVerts{0.5f, 0.5f, 0, -0.5f, 0.5f, 0, 0.5f, -0.5f, 0, -0.5f, -0.5f, 0};
-constexpr std::array<float, 12> llQuadVerts{1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0};
-constexpr std::array<float, 12> lrQuadVerts{0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 0, 0};
-constexpr std::array<float, 12> ulQuadVerts{1, 0, 0, 0, 0, 0, 1, -1, 0, 0, -1, 0};
-constexpr std::array<float, 12> urQuadVerts{0, 0, 0, -1, 0, 0, 0, -1, 0, -1, -1, 0};
-
-Application::Application(const u32 width, const u32 height, const u32 targetFPS) : window(width, height)
+Application::Application(const u32 width, const u32 height, const u32 targetFPS)
 {
   this->targetFPS = targetFPS;
   this->deltaTime.setTargetFinder([this]{return 1.0f / (float)this->targetFPS;});
   
-  objectShader = glr::Shader("Object shader", vertSrc, fragSrc);
-  textShader = glr::Shader("Text shader", vertSrc, textFragSrc);
-  
-  fullscreenQuad = glr::Mesh(fullscreenQuadVerts, fullscreenQuadUVs);
-  quad = glr::Mesh(ulQuadVerts, orthoQuadUVs);
+  this->window = std::make_unique<Window>(width, height);
+  this->textRenderer = std::make_unique<TextRenderer>();
 }
 
-void Application::addTextToRender(const ID text)
+void Application::addTextToRender(const ID text) const
 {
-  this->textToRender.emplace_back(text);
+  this->textRenderer->addText(text);
 }
 
 void Application::run()
@@ -67,84 +46,97 @@ void Application::run()
           default: break;
         }
       }
-      this->window.clearFramebuffer();
-
       //Render text
-      glr::RenderList rl;
-      for(const ID entity : this->textToRender)
-      {
-        TextBlock& text = this->ecs.getText(entity);
-
-        if(this->ecs.hasSolidRainbowEffect(entity))
-        {
-          SolidRainbowEffect& effect = this->ecs.getSolidRainbowEffect(entity);
-          if(this->frames % effect.updateRate == 0)
-          {
-            effect.apply(text.currentColor, this->deltaTime.deltaF);
-          }
-        }
-        if(this->ecs.hasSolidRainbowFadeEffect(entity))
-        {
-          SolidRainbowFadeEffect& effect = this->ecs.getSolidRainbowFadeEffect(entity);
-          if(this->frames % effect.updateRate == 0)
-          {
-            effect.apply(text.currentColor, this->deltaTime.deltaF);
-          }
-        }
-        
-        for(size_t i = 0; i < text.text.length(); i++)
-        {
-          vec2<float> charPos = text.penPositions.at(i);
-
-          if(this->ecs.hasJitterEffect(entity))
-          {
-            JitterEffect& effect = this->ecs.getJitterEffect(entity);
-            if(this->frames % effect.updateRate == 0)
-            {
-              effect.apply(i, charPos, this->deltaTime.deltaF);
-            }
-          }
-          if(this->ecs.hasRainbowEffect(entity))
-          {
-            RainbowEffect& effect = this->ecs.getRainbowEffect(entity);
-            if(this->frames % effect.updateRate == 0)
-            {
-              effect.apply(i, text.currentColor, this->deltaTime.deltaF);
-            }
-          }
-          if(this->ecs.hasRainbowWaveEffect(entity))
-          {
-            RainbowWaveEffect& effect = this->ecs.getRainbowWaveEffect(entity);
-            if(this->frames % effect.updateRate == 0)
-            {
-              effect.apply(i, text.currentColor, this->deltaTime.deltaF);
-            }
-          }
-
-          //TODO FIXME position/color data persistence when effects are active but updateRate is not 1
-          const char& character = text.text.at(i);
-          vec2 size = text.atlas->getTileDimensions(std::string{character});
-          glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
-
-          //TODO FIXME this shouldn't need to exist, hb_shape should be giving y offsets but isn't
-          /*if(character == 'p' || character == 'y' || character == 'q' || character == 'j' || character == 'g')
-          {
-            charPos.y() -= 7;
-          }*/
-          
-          glr::Renderable r{{text.position.x() + charPos.x(), text.position.y() + charPos.y(), 0.0f}, {size.width(), size.height(), 1}, quat<float>{},
-          &*text.texture,
-          &textShader,
-          &quad,
-          1, 0, "text",
-          glr::Renderable::CharacterInfo{character, text.currentColor, uvs, "inputColor"}};
-          
-          rl.add({r});
-        }
-      }
-      this->window.draw(std::move(rl));
-      this->window.swapFramebuffer();
+      glr::RenderList graph = this->textRenderer->makeSceneGraph(this->frames, this->deltaTime.deltaF);
+      this->window->clearFramebuffer();
+      this->window->draw(std::move(graph));
+      this->window->swapFramebuffer();
       this->frames++;
     }
   }
+}
+
+ID Application::newEntity(const std::string &text, const std::vector<u8> &font, const std::string &fontName, u32 pointSize, glr::Color color, const Language &language, const std::vector<hb_feature_t> &features) const
+{
+  return this->textRenderer->ecs.newEntity(text, font, fontName, pointSize, color, language, features);
+}
+
+void Application::addJitterEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.addJitterEffect(entity);
+}
+
+void Application::addRainbowEffect(const ID entity) const
+{
+  this->textRenderer->ecs.addRainbowEffect(entity);
+}
+
+void Application::addRainbowWaveEffect(const ID entity) const
+{
+  this->textRenderer->ecs.addRainbowWaveEffect(entity);
+}
+
+void Application::addSolidRainbowEffect(const ID entity) const
+{
+  this->textRenderer->ecs.addSolidRainbowEffect(entity);
+}
+
+void Application::addSolidRainbowFadeEffect(const ID entity) const
+{
+  this->textRenderer->ecs.addSolidRainbowFadeEffect(entity);
+}
+
+TextBlock &Application::getText(const ID entity) const
+{
+  return this->textRenderer->ecs.getText(entity);
+}
+
+JitterEffect &Application::getJitterEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getJitterEffect(entity);
+}
+
+RainbowEffect &Application::getRainbowEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getRainbowEffect(entity);
+}
+
+RainbowWaveEffect &Application::getRainbowWaveEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getRainbowWaveEffect(entity);
+}
+
+SolidRainbowEffect &Application::getSolidRainbowEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getSolidRainbowEffect(entity);
+}
+
+SolidRainbowFadeEffect &Application::getSolidRainbowFadeEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getSolidRainbowFadeEffect(entity);
+}
+
+bool Application::hasJitterEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasJitterEffect(entity);
+}
+
+bool Application::hasRainbowEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasRainbowEffect(entity);
+}
+
+bool Application::hasRainbowWaveEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasRainbowWaveEffect(entity);
+}
+
+bool Application::hasSolidRainbowEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasSolidRainbowEffect(entity);
+}
+
+bool Application::hasSolidRainbowFadeEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasSolidRainbowFadeEffect(entity);
 }
