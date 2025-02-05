@@ -35,11 +35,13 @@ void SolidRainbowFadeEffect::apply(glr::Color& currentColor, const float deltaTi
   }
 }
 
+//TODO FIXME low values make only a few glyphs get proper offsets <1
 RainbowWaveEffect::RainbowWaveEffect(const size_t numGlyphs)
 {
   this->currentT.resize(numGlyphs);
   float cur = 0.0f;
-  const float stepSize = 1.0f / (this->gradientLength / (float)numGlyphs) / (float)numGlyphs;
+  const float norm = this->gradientLength / 360.0f;
+  const float stepSize = norm / (float)numGlyphs;
   
   for(float& t : this->currentT)
   {
