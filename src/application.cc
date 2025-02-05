@@ -66,6 +66,11 @@ void Application::addJitterEffect(const ID entity) const
   return this->textRenderer->ecs.addJitterEffect(entity);
 }
 
+void Application::addWaveEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.addWaveEffect(entity);
+}
+
 void Application::addRainbowEffect(const ID entity) const
 {
   this->textRenderer->ecs.addRainbowEffect(entity);
@@ -96,6 +101,11 @@ JitterEffect &Application::getJitterEffect(const ID entity) const
   return this->textRenderer->ecs.getJitterEffect(entity);
 }
 
+WaveEffect &Application::getWaveEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getWaveEffect(entity);
+}
+
 RainbowEffect &Application::getRainbowEffect(const ID entity) const
 {
   return this->textRenderer->ecs.getRainbowEffect(entity);
@@ -119,6 +129,11 @@ SolidRainbowFadeEffect &Application::getSolidRainbowFadeEffect(const ID entity) 
 bool Application::hasJitterEffect(const ID entity) const
 {
   return this->textRenderer->ecs.hasJitterEffect(entity);
+}
+
+bool Application::hasWaveEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasWaveEffect(entity);
 }
 
 bool Application::hasRainbowEffect(const ID entity) const

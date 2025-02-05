@@ -66,6 +66,18 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
     {
       vec2<float> charPos = text.penPositions.at(i);
 
+      if(this->ecs.hasWaveEffect(entity))
+      {
+        WaveEffect& effect = this->ecs.getWaveEffect(entity);
+        if(effect.updateRate > 0 && frames % effect.updateRate == 0)
+        {
+          effect.apply(i, charPos, deltaTime);
+        }
+        else
+        {
+          charPos += effect.currentPosition.at(i);
+        }
+      }
       if(this->ecs.hasJitterEffect(entity))
       {
         JitterEffect& effect = this->ecs.getJitterEffect(entity);

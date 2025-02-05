@@ -1,6 +1,7 @@
 #include "effects.hh"
-
 #include "../util.hh"
+
+#include <numbers>
 
 RainbowEffect::RainbowEffect(const size_t numGlyphs)
 {
@@ -76,6 +77,39 @@ void JitterEffect::apply(const size_t currentGlyph, vec2<float>& currentPos, con
   {
     return;
   }
+  
   this->currentPosition.at(currentGlyph) = {randomFloat(-this->amount, this->amount), randomFloat(-this->amount, this->amount)};
   currentPos += this->currentPosition.at(currentGlyph);
+}
+
+WaveEffect::WaveEffect(const size_t numGlyphs)
+{
+  this->currentT.resize(numGlyphs);
+  this->currentPosition.resize(numGlyphs);
+  const float norm = this->amplitude / 100.0f;
+  const float stepSize = norm / (float)numGlyphs;
+  float cur = 0.0f;
+  for(float& t : this->currentT)
+  {
+    t = cur;
+    cur += stepSize;
+  }
+}
+
+void WaveEffect::apply(const size_t currentGlyph, vec2<float> &currentPos, const float deltaTime)
+{
+  if(this->currentPosition.size() < currentGlyph)
+  {
+    return;
+  }
+  
+  float& t = this->currentT.at(currentGlyph);
+  currentPos.y() += this->amplitude * std::sin(2.0 * std::numbers::pi * this->frequency * t);
+  this->currentPosition.at(currentGlyph) = currentPos;
+  
+  t += 0.1f * deltaTime;
+  if(t > 1.0f)
+  {
+    t = 0.0f;
+  }
 }

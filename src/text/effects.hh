@@ -65,3 +65,21 @@ struct JitterEffect
   
   std::vector<vec2<float>> currentPosition;
 };
+
+struct WaveEffect
+{
+  WaveEffect() = default;
+  explicit WaveEffect(size_t numGlyphs);
+  
+  void apply(size_t currentGlyph, vec2<float>& currentPos, float deltaTime);
+
+  float amplitude = 10.0f; //0-100
+  float frequency = 20.0f;
+  u32 updateRate = 1;
+  std::vector<vec2<float>> currentPosition;
+
+  private:
+  std::vector<float> currentT{};
+};
+
+//TODO particle system effect to overlay sparkles, hearts, etc

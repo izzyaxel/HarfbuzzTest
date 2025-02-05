@@ -14,6 +14,11 @@ void TextECS::addJitterEffect(const ID entity)
   this->jitterEffects[entity] = JitterEffect(this->textBlocks.at(entity).text.length());
 }
 
+void TextECS::addWaveEffect(const ID entity)
+{
+  this->waveEffects[entity] = WaveEffect(this->textBlocks.at(entity).text.length());
+}
+
 void TextECS::addRainbowEffect(const ID entity)
 {
   this->rainbowEffects[entity] = RainbowEffect(this->textBlocks.at(entity).text.length());
@@ -44,6 +49,11 @@ JitterEffect& TextECS::getJitterEffect(const ID entity)
   return this->jitterEffects.at(entity);
 }
 
+WaveEffect &TextECS::getWaveEffect(const ID entity)
+{
+  return this->waveEffects.at(entity);
+}
+
 RainbowEffect& TextECS::getRainbowEffect(const ID entity)
 {
   return this->rainbowEffects.at(entity);
@@ -64,27 +74,32 @@ RainbowWaveEffect& TextECS::getRainbowWaveEffect(const ID entity)
   return this->rainbowWaveEffects.at(entity);
 }
 
-bool TextECS::hasJitterEffect(const ID entity)
+bool TextECS::hasJitterEffect(const ID entity) const
 {
   return this->jitterEffects.contains(entity);
 }
 
-bool TextECS::hasRainbowEffect(const ID entity)
+bool TextECS::hasWaveEffect(const ID entity) const
+{
+  return this->waveEffects.contains(entity);
+}
+
+bool TextECS::hasRainbowEffect(const ID entity) const
 {
   return this->rainbowEffects.contains(entity);
 }
 
-bool TextECS::hasSolidRainbowEffect(const ID entity)
+bool TextECS::hasSolidRainbowEffect(const ID entity) const
 {
   return this->solidRainbowEffects.contains(entity);
 }
 
-bool TextECS::hasSolidRainbowFadeEffect(const ID entity)
+bool TextECS::hasSolidRainbowFadeEffect(const ID entity) const
 {
   return this->solidRainbowFadeEffects.contains(entity);
 }
 
-bool TextECS::hasRainbowWaveEffect(const ID entity)
+bool TextECS::hasRainbowWaveEffect(const ID entity) const
 {
   return this->rainbowWaveEffects.contains(entity);
 }
