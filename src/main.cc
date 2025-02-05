@@ -12,10 +12,11 @@ int main()
   app.getText(textEntity).position.x() = -250;
   
   app.addRainbowWaveEffect(textEntity);
+  app.getRainbowWaveEffect(textEntity).updateRate = 5;
   
   app.addJitterEffect(textEntity);
   app.getJitterEffect(textEntity).amount = 2;
-  //app.getJitterEffect(textEntity).updateRate = 20;
+  app.getJitterEffect(textEntity).updateRate = 5;
   
   app.addTextToRender(textEntity);
   app.run();

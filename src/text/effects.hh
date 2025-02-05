@@ -11,8 +11,6 @@ struct RainbowEffect
   void apply(size_t currentGlyph, glr::Color& currentColor, float deltaTime);
 
   u32 updateRate = 1; //Runs once every x frames
-
-  private:
   std::vector<glr::Color> currentColor;
 };
 
@@ -22,8 +20,6 @@ struct SolidRainbowEffect
   void apply(glr::Color& currentColor, float deltaTime);
 
   u32 updateRate = 1;
-
-  private:
   glr::Color currentColor;
 };
 
@@ -33,9 +29,9 @@ struct SolidRainbowFadeEffect
   void apply(glr::Color& currentColor, float deltaTime);
 
   u32 updateRate = 1;
+  glr::Color currentColor;
 
   private:
-  glr::Color currentColor;
   float t = 0.0f;
 };
 
@@ -50,6 +46,7 @@ struct RainbowWaveEffect
   float saturation = 1.0f; //0-1, %
   float brightness = 1.0f; //0-1, %
   u32 updateRate = 1;
+  std::vector<glr::Color> currentColor{};
 
   private:
   std::vector<float> currentT{};
@@ -65,7 +62,6 @@ struct JitterEffect
 
   u32 updateRate = 1;
   float amount = 5; //+- pixel value around the center point on both axes
-
-  private:
+  
   std::vector<vec2<float>> currentPosition;
 };

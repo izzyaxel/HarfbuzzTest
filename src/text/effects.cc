@@ -37,6 +37,7 @@ void SolidRainbowFadeEffect::apply(glr::Color& currentColor, const float deltaTi
 
 RainbowWaveEffect::RainbowWaveEffect(const size_t numGlyphs)
 {
+  this->currentColor.resize(numGlyphs);
   this->currentT.resize(numGlyphs);
   float cur = 0.0f;
   const float norm = this->gradientLength / 360.0f;
@@ -55,6 +56,7 @@ void RainbowWaveEffect::apply(const size_t currentGlyph, glr::Color& currentColo
   float hue = lerp(0.0f, 360.0f, t);
   vec3<float> rgb = hsvTorgb({hue, this->saturation, this->brightness});
   currentColor.fromRGBAf(rgb.r(), rgb.g(), rgb.b(), 1);
+  this->currentColor.at(currentGlyph) = currentColor;
   
   t += 0.1f * deltaTime;
   if(t > 1.0f)

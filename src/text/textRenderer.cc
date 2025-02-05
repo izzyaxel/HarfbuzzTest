@@ -44,6 +44,10 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
       {
         effect.apply(text.currentColor, deltaTime);
       }
+      else
+      {
+        text.currentColor = effect.currentColor;
+      }
     }
     if(this->ecs.hasSolidRainbowFadeEffect(entity))
     {
@@ -51,6 +55,10 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
       if(effect.updateRate > 0 && frames % effect.updateRate == 0)
       {
         effect.apply(text.currentColor, deltaTime);
+      }
+      else
+      {
+        text.currentColor = effect.currentColor;
       }
     }
     
@@ -65,6 +73,10 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
         {
           effect.apply(i, charPos, deltaTime);
         }
+        else
+        {
+          charPos += effect.currentPosition.at(i);
+        }
       }
       if(this->ecs.hasRainbowEffect(entity))
       {
@@ -72,6 +84,10 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
         if(effect.updateRate > 0 && frames % effect.updateRate == 0)
         {
           effect.apply(i, text.currentColor, deltaTime);
+        }
+        else
+        {
+          text.currentColor = effect.currentColor.at(i);
         }
       }
       if(this->ecs.hasRainbowWaveEffect(entity))
@@ -81,9 +97,12 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
         {
           effect.apply(i, text.currentColor, deltaTime);
         }
+        else
+        {
+          text.currentColor = effect.currentColor.at(i);
+        }
       }
-
-      //TODO FIXME position/color data persistence when effects are active but updateRate is not 1
+      
       const char& character = text.text.at(i);
       vec2 size = text.atlas->getTileDimensions(std::string{character});
       glr::QuadUVs uvs = text.atlas->getUVsForTile(std::string{character});
