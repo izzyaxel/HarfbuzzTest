@@ -121,7 +121,6 @@ ParticleEffect::Particle::Particle(const vec2<float>& position, const vec2<u32>&
   this->position = position;
   this->maxSize = vec2<float>{size};
   this->currentSize = this->maxSize;
-  this->lifespan += randomFloat(-0.1f, 0.1f);
 }
 
 void ParticleEffect::Particle::update(const float deltaTime)
@@ -166,6 +165,7 @@ void ParticleEffect::apply(const vec2<float> &currentPos, const vec2<float>& off
           const float x = randomFloat(-this->radius, this->radius);
           const float y = randomFloat(-this->radius, this->radius);
           particle = std::make_unique<Particle>(currentPos + offset + vec2{x, y}, this->particleTextureSize);
+          particle->lifespan = this->particleLifespan + randomFloat(-this->particleLifespanJitter, this->particleLifespanJitter);
           this->currentParticles++;
           break;
         }

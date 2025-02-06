@@ -115,6 +115,8 @@ struct ParticleEffect
   float radius = 50.0f; //How far away from the center of the glyph a particle can spawn
   float spawnThreshold = 0.99f; //0-1, A random number from 0-1 is chosen in apply(), and if the result is >= spawnThreshold, a particle spawns
   vec2<float> particleScale{1, 1};
+  float particleLifespan = 0.5f;
+  float particleLifespanJitter = 0.1f; //Adjusts lifetime a random amount between -particleLifespanJitter to +particleLifespanJitter
   
   std::vector<std::unique_ptr<Particle>> particles{};
   std::unique_ptr<glr::Texture> particleTexture = nullptr;
