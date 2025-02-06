@@ -2,6 +2,11 @@
 
 #include "glrColor.hh"
 #include "../util.hh"
+#include "../pngFormat.hh"
+
+#include <glrTexture.hh>
+#include <glrShader.hh>
+#include <glrRenderList.hh>
 
 /// Each glyph is a random color that changes over time
 struct RainbowEffect
@@ -82,4 +87,42 @@ struct WaveEffect
   std::vector<float> currentT{};
 };
 
-//TODO particle system effect to overlay sparkles, hearts, etc
+struct ParticleEffect
+{
+  struct Particle
+  {
+    Particle() = default;
+    explicit Particle(const vec2<float>& position, const vec2<u32>& size);
+    void update(float deltaTime);
+    
+    vec2<float> position{};
+    vec2<float> currentSize{};
+    vec2<float> maxSize{};
+    quat<float> rotation{};
+    
+    float timeAlive = 0.0f; //Seconds, how long the particle has existed for
+    float lifespan = 0.5f; //Seconds, how long the particle will exist for once created
+    float progress = 0.0f; //0-1, %, how close the particle is to reaching the end of its lifespan
+  };
+
+  ParticleEffect() = default;
+  explicit ParticleEffect(size_t maxParticles);
+  
+  void apply(const vec2<float>& currentPos, const vec2<float>& offset, float deltaTime);
+  void setParticleTexture(const std::string& name, const std::string &path, glr::TexColorFormat colorFmt);
+  glr::RenderList makeSceneGraph() const;
+
+  float radius = 50.0f; //How far away from the center of the glyph a particle can spawn
+  float spawnThreshold = 0.99f; //0-1, A random number from 0-1 is chosen in apply(), and if the result is >= spawnThreshold, a particle spawns
+  vec2<float> particleScale{1, 1};
+  
+  std::vector<std::unique_ptr<Particle>> particles{};
+  std::unique_ptr<glr::Texture> particleTexture = nullptr;
+  std::unique_ptr<glr::Shader> particleShader = nullptr;
+  std::unique_ptr<glr::Mesh> particleMesh = nullptr;
+
+  private:
+  u32 maxParticles = 1;
+  u32 currentParticles = 0;
+  vec2<u32> particleTextureSize{};
+};

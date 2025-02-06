@@ -22,7 +22,7 @@ TextRenderer::TextRenderer()
   textShader = glr::Shader("Text shader", vertSrc, textFragSrc);
   
   fullscreenQuad = glr::Mesh(fullscreenQuadVerts, fullscreenQuadUVs);
-  quad = glr::Mesh(ulQuadVerts, orthoQuadUVs);
+  quad = glr::Mesh(cQuadVerts, orthoQuadUVs);
 }
 
 void TextRenderer::addText(ID entity)
@@ -36,7 +36,7 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
   for(const ID entity : this->textToRender)
   {
     TextBlock& text = this->ecs.getText(entity);
-
+    
     if(this->ecs.hasSolidRainbowEffect(entity))
     {
       SolidRainbowEffect& effect = this->ecs.getSolidRainbowEffect(entity);
@@ -66,6 +66,11 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
     {
       vec2<float> charPos = text.penPositions.at(i);
 
+      if(this->ecs.hasParticleEffect(entity))
+      {
+        ParticleEffect& effect = this->ecs.getParticleEffect(entity);
+        effect.apply(charPos, text.position, deltaTime);
+      }
       if(this->ecs.hasWaveEffect(entity))
       {
         WaveEffect& effect = this->ecs.getWaveEffect(entity);
@@ -133,6 +138,11 @@ glr::RenderList TextRenderer::makeSceneGraph(const u64 frames, const float delta
       glr::Renderable::CharacterInfo{character, text.currentColor, uvs, "inputColor"}};
       
       out.add({r});
+    }
+
+    if(this->ecs.hasParticleEffect(entity))
+    {
+      out = out + this->ecs.getParticleEffect(entity).makeSceneGraph();
     }
   }
   return out;

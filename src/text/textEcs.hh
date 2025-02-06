@@ -15,6 +15,7 @@ struct TextECS
   void addSolidRainbowEffect(ID entity);
   void addSolidRainbowFadeEffect(ID entity);
   void addRainbowWaveEffect(ID entity);
+  void addParticleEffect(ID entity, u32 maxParticles);
   
   TextBlock& getText(ID entity);
   JitterEffect& getJitterEffect(ID entity);
@@ -23,6 +24,7 @@ struct TextECS
   SolidRainbowEffect& getSolidRainbowEffect(ID entity);
   SolidRainbowFadeEffect& getSolidRainbowFadeEffect(ID entity);
   RainbowWaveEffect& getRainbowWaveEffect(ID entity);
+  ParticleEffect& getParticleEffect(ID entity);
 
   bool hasJitterEffect(ID entity) const;
   bool hasWaveEffect(ID entity) const;
@@ -30,6 +32,7 @@ struct TextECS
   bool hasSolidRainbowEffect(ID entity) const;
   bool hasSolidRainbowFadeEffect(ID entity) const;
   bool hasRainbowWaveEffect(ID entity) const;
+  bool hasParticleEffect(ID entity) const;
 
   private:
   std::vector<ID> entities{};
@@ -41,6 +44,7 @@ struct TextECS
   std::unordered_map<ID, SolidRainbowEffect> solidRainbowEffects{};
   std::unordered_map<ID, SolidRainbowFadeEffect> solidRainbowFadeEffects{};
   std::unordered_map<ID, RainbowWaveEffect> rainbowWaveEffects{};
+  std::unordered_map<ID, ParticleEffect> particleEffects{};
 
   ID lastEntity = 0;
   ID lastFontFile = 0;

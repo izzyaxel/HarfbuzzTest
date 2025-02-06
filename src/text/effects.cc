@@ -1,7 +1,9 @@
 #include "effects.hh"
 #include "../util.hh"
+#include "../shaders.hh"
 
 #include <numbers>
+#include <commons/misc.hh>
 
 RainbowEffect::RainbowEffect(const size_t numGlyphs)
 {
@@ -112,4 +114,93 @@ void WaveEffect::apply(const size_t currentGlyph, vec2<float> &currentPos, const
   {
     t = 0.0f;
   }
+}
+
+ParticleEffect::Particle::Particle(const vec2<float>& position, const vec2<u32>& size)
+{
+  this->position = position;
+  this->maxSize = vec2<float>{size};
+  this->currentSize = this->maxSize;
+  this->lifespan += randomFloat(-0.1f, 0.1f);
+}
+
+void ParticleEffect::Particle::update(const float deltaTime)
+{
+  this->timeAlive += deltaTime * deltaTime;
+  this->progress = bound(this->timeAlive / this->lifespan, 0.0f, 1.0f);
+  this->currentSize.x() = lerp(this->maxSize.x(), 0.0f, this->progress);
+  this->currentSize.y() = lerp(this->maxSize.y(), 0.0f, this->progress);
+}
+
+ParticleEffect::ParticleEffect(const size_t maxParticles)
+{
+  constexpr std::array<float, 8>  orthoQuadUVs{1, 0, 0, 0, 1, 1, 0, 1};
+  constexpr std::array<float, 12> cQuadVerts{0.5f, 0.5f, 0, -0.5f, 0.5f, 0, 0.5f, -0.5f, 0, -0.5f, -0.5f, 0};
+  this->particleMesh = std::make_unique<glr::Mesh>(cQuadVerts, orthoQuadUVs);
+  this->particleShader = std::make_unique<glr::Shader>("Object shader", vertSrc, fragSrc);
+  
+  this->maxParticles = maxParticles;
+  this->particles.resize(maxParticles);
+}
+
+void ParticleEffect::setParticleTexture(const std::string& name, const std::string &path, const glr::TexColorFormat colorFmt)
+{
+  PNG png = decodePNG(path);
+  this->particleTextureSize.width() = png.width;
+  this->particleTextureSize.height() = png.height;
+  this->particleTexture = std::make_unique<glr::Texture>(name, png.imageData.data(), this->particleTextureSize.width(), this->particleTextureSize.height(), colorFmt);
+}
+
+void ParticleEffect::apply(const vec2<float> &currentPos, const vec2<float>& offset, const float deltaTime)
+{
+  if(this->currentParticles < this->maxParticles)
+  {
+    const float rng = randomFloat(0.0f, 1.0f);
+    if(rng >= this->spawnThreshold)
+    {
+      for(auto& particle : this->particles)
+      {
+        if(!particle)
+        {
+          //TODO random position in circular bounds?
+          const float x = randomFloat(-this->radius, this->radius);
+          const float y = randomFloat(-this->radius, this->radius);
+          particle = std::make_unique<Particle>(currentPos + offset + vec2{x, y}, this->particleTextureSize);
+          this->currentParticles++;
+          break;
+        }
+      }
+    }
+  }
+  
+  for(auto& particle : this->particles)
+  {
+    if(!particle)
+    {
+      continue;
+    }
+    
+    particle->update(deltaTime);
+    if(particle->timeAlive >= particle->lifespan)
+    {
+      particle = nullptr;
+      this->currentParticles--;
+    }
+  }
+}
+
+glr::RenderList ParticleEffect::makeSceneGraph() const
+{
+  glr::RenderList out;
+  for(const auto& particle : this->particles)
+  {
+    if(!particle)
+    {
+      continue;
+    }
+    
+    glr::Renderable r{vec3{particle->position, 0.0f}, vec3{particle->currentSize * this->particleScale, 1.0f}, particle->rotation, this->particleTexture.get(), this->particleShader.get(), this->particleMesh.get(), 0, 0, "particle"};
+    out.add({r});
+  }
+  return out;
 }

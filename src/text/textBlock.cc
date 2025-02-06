@@ -45,6 +45,7 @@ TextBlock::TextBlock(const std::string& text, const std::vector<u8>& font, const
   this->currentColor = color;
   this->texture = std::make_unique<glr::Texture>();
   this->atlas = std::make_unique<glr::Atlas>();
+  this->currentColor.fromRGBAf(0, 0, 0, 1);
 
   //Rasterize the font with Freetype to an OpenGL texture atlas
   //Start FreeType

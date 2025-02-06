@@ -69,9 +69,11 @@ set(SOURCE
         src/text/textEcs.cc
         src/text/textEcs.hh
         src/text/textRenderer.cc
-        src/text/textRenderer.hh)
+        src/text/textRenderer.hh
+        src/pngFormat.cc
+        src/pngFormat.hh)
 
-set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc)
+set(LIBS commons GLRender SDL2 harfbuzz freetype fontconfig icuuc png)
 
 project(HarfbuzzTest)
 add_executable(${PROJECT_NAME} ${SOURCE})
@@ -79,4 +81,4 @@ add_dependencies(${PROJECT_NAME} commons GLRender)
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 #Copy the files the editor needs to run into the build directory
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/fonts" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")

@@ -86,6 +86,11 @@ void Application::addRainbowWaveEffect(const ID entity) const
   this->textRenderer->ecs.addRainbowWaveEffect(entity);
 }
 
+void Application::addParticleEffect(const ID entity, const u32 maxParticles) const
+{
+  this->textRenderer->ecs.addParticleEffect(entity, maxParticles);
+}
+
 void Application::addSolidRainbowEffect(const ID entity) const
 {
   this->textRenderer->ecs.addSolidRainbowEffect(entity);
@@ -119,6 +124,11 @@ RainbowEffect &Application::getRainbowEffect(const ID entity) const
 RainbowWaveEffect &Application::getRainbowWaveEffect(const ID entity) const
 {
   return this->textRenderer->ecs.getRainbowWaveEffect(entity);
+}
+
+ParticleEffect &Application::getParticleEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.getParticleEffect(entity);
 }
 
 SolidRainbowEffect &Application::getSolidRainbowEffect(const ID entity) const
@@ -159,4 +169,9 @@ bool Application::hasSolidRainbowEffect(const ID entity) const
 bool Application::hasSolidRainbowFadeEffect(const ID entity) const
 {
   return this->textRenderer->ecs.hasSolidRainbowFadeEffect(entity);
+}
+
+bool Application::hasParticleEffect(const ID entity) const
+{
+  return this->textRenderer->ecs.hasParticleEffect(entity);
 }

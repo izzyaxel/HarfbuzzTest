@@ -21,6 +21,7 @@ struct Application
   void addSolidRainbowEffect(ID entity) const;
   void addSolidRainbowFadeEffect(ID entity) const;
   void addRainbowWaveEffect(ID entity) const;
+  void addParticleEffect(ID entity, u32 maxParticles) const;
   
   TextBlock& getText(ID entity) const;
   JitterEffect& getJitterEffect(ID entity) const;
@@ -29,6 +30,7 @@ struct Application
   SolidRainbowEffect& getSolidRainbowEffect(ID entity) const;
   SolidRainbowFadeEffect& getSolidRainbowFadeEffect(ID entity) const;
   RainbowWaveEffect& getRainbowWaveEffect(ID entity) const;
+  ParticleEffect& getParticleEffect(ID entity) const;
   
   bool hasJitterEffect(ID entity) const;
   bool hasWaveEffect(ID entity) const;
@@ -36,6 +38,7 @@ struct Application
   bool hasSolidRainbowEffect(ID entity) const;
   bool hasSolidRainbowFadeEffect(ID entity) const;
   bool hasRainbowWaveEffect(ID entity) const;
+  bool hasParticleEffect(ID entity) const;
   
   void addTextToRender(ID text) const;
 

@@ -52,6 +52,11 @@ void TextECS::addRainbowWaveEffect(const ID entity)
   this->rainbowWaveEffects[entity] = RainbowWaveEffect(this->textBlocks.at(entity).text.length());
 }
 
+void TextECS::addParticleEffect(const ID entity, const u32 maxParticles)
+{
+  this->particleEffects[entity] = ParticleEffect(maxParticles);
+}
+
 TextBlock& TextECS::getText(const ID entity)
 {
   return this->textBlocks.at(entity);
@@ -87,6 +92,11 @@ RainbowWaveEffect& TextECS::getRainbowWaveEffect(const ID entity)
   return this->rainbowWaveEffects.at(entity);
 }
 
+ParticleEffect &TextECS::getParticleEffect(const ID entity)
+{
+  return this->particleEffects.at(entity);
+}
+
 bool TextECS::hasJitterEffect(const ID entity) const
 {
   return this->jitterEffects.contains(entity);
@@ -115,4 +125,9 @@ bool TextECS::hasSolidRainbowFadeEffect(const ID entity) const
 bool TextECS::hasRainbowWaveEffect(const ID entity) const
 {
   return this->rainbowWaveEffects.contains(entity);
+}
+
+bool TextECS::hasParticleEffect(const ID entity) const
+{
+  return this->particleEffects.contains(entity);
 }
